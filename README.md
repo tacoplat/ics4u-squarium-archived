@@ -1,9 +1,10 @@
 # Final Project
+#### By: Andy Zhen and Crystal Zhang
 
-**Greenfoot**
+*(With JavaFx)*
 
-If you are doing the geenfoot version please delete the `src` folder
+### [Project Statement Scope](https://docs.google.com/document/d/1xLI6LGGu44HKDfOvJ3klcLbo6vebbfh391KwUjpQKhw/edit)
 
-**JavaFx**
 
-If you are doing a JavaFx version please delete the `Greenfoot Template` folder
+## Meeting Minutes:
+* [May 13th, 2021](https://docs.google.com/document/d/1-LI_7agddvXbk9I_RBRlDVYnwYcfrRpEq9JxxgzuCTU/edit)
