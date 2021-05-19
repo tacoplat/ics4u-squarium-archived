@@ -8,3 +8,4 @@
 
 ## Meeting Minutes:
 * [May 13th, 2021](https://docs.google.com/document/d/1-LI_7agddvXbk9I_RBRlDVYnwYcfrRpEq9JxxgzuCTU/edit)
+* [May 18th, 2021](https://docs.google.com/document/d/1UpuGwjgSYtpYRKQpUrXi8e0-toGPV8ObHLJK-B1g4zc/edit)
