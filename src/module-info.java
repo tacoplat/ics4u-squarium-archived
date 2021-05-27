@@ -1,6 +1,7 @@
 module Template {
 	requires javafx.controls;
-    requires javafx.graphics;
-
-    opens application to javafx.graphics, javafx.fxml;
+	requires javafx.fxml;
+	requires javafx.graphics;
+	
+	opens application to javafx.graphics, javafx.fxml;
 }
