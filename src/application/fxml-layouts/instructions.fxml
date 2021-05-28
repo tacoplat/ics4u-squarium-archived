@@ -49,7 +49,14 @@
               <tabs>
                 <Tab text="Classic">
                   <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" styleClass="anchor-pane" />
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" styleClass="anchor-pane">
+                           <children>
+                              <Button alignment="CENTER" ellipsisString="" layoutX="66.0" layoutY="388.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="40.0" styleClass="arrow-btns" text="↑" textAlignment="CENTER" textOverrun="CENTER_WORD_ELLIPSIS" />
+                              <Button alignment="CENTER" ellipsisString="" layoutX="66.0" layoutY="432.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="40.0" styleClass="arrow-btns" text="↓" textAlignment="CENTER" textOverrun="CENTER_WORD_ELLIPSIS" />
+                              <Button alignment="CENTER" ellipsisString="" layoutX="22.0" layoutY="432.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="40.0" styleClass="arrow-btns" text="←" textAlignment="CENTER" textOverrun="CENTER_WORD_ELLIPSIS" />
+                              <Button alignment="CENTER" ellipsisString="" layoutX="110.0" layoutY="432.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="40.0" styleClass="arrow-btns" text="→" textAlignment="CENTER" textOverrun="CENTER_WORD_ELLIPSIS" />
+                              <Button alignment="CENTER" contentDisplay="CENTER" layoutX="163.0" layoutY="432.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="140.0" styleClass="arrow-btns" text="SPACE" textAlignment="CENTER" />
+                           </children></AnchorPane>
                   </content>
                 </Tab>
                 <Tab text="Inverted">

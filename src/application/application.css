@@ -61,6 +61,17 @@
 
 .tab {
   -fx-font-family: "Open Sans", sans-serif;
-  -fx-padding: 2px 12px;
+  -fx-padding: 2px 18px;
   -fx-background-color: #D3C8F9;
+  -fx-focus-color: transparent;
+  -fx-faint-focus-color: transparent;
+}
+
+.arrow-btns {
+  -fx-font-size: 14px;
+  -fx-font-weight: bold;
+  -fx-border-color: #242230;
+  -fx-background-color: #FCD9E0;
+  -fx-border-radius: 0.25em;
+  -fx-text-fill: #242230;
 }
