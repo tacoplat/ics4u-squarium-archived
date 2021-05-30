@@ -19,7 +19,7 @@
             </Text>
             <VBox alignment="CENTER" layoutX="75.0" layoutY="73.0" prefHeight="226.0" prefWidth="250.0" spacing="25.0">
                <children>
-                  <Button id="easy-button" mnemonicParsing="false" prefHeight="44.0" prefWidth="218.0" styleClass="main-button" text="Easy" />
+                  <Button id="easy-button" mnemonicParsing="false" onAction="#openClassicEasy" prefHeight="44.0" prefWidth="218.0" styleClass="main-button" text="Easy" />
                   <Button id="medium-button" mnemonicParsing="false" prefHeight="44.0" prefWidth="218.0" styleClass="main-button" text="Medium" />
                   <Button id="hard-button" mnemonicParsing="false" prefHeight="44.0" prefWidth="218.0" styleClass="main-button" text="Hard" />
                </children>
