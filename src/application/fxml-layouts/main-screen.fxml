@@ -43,7 +43,7 @@
          <children>
             <VBox alignment="CENTER" layoutX="75.0" layoutY="320.0" prefHeight="230.0" prefWidth="250.0" spacing="30.0">
                <children>
-                  <Button mnemonicParsing="false" prefHeight="44.0" prefWidth="218.0" styleClass="main-button" text="Play" />
+                  <Button mnemonicParsing="false" onAction="#openModeSelection" prefHeight="44.0" prefWidth="218.0" styleClass="main-button" text="Start" />
                   <Button fx:id="instructionsBtn" mnemonicParsing="false" onAction="#openInstructions" prefHeight="44.0" prefWidth="218.0" styleClass="main-button" text="Instructions" />
                   <Button mnemonicParsing="false" prefHeight="44.0" prefWidth="218.0" styleClass="main-button" text="Scoreboard" />
                </children>

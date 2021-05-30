@@ -97,6 +97,11 @@ public class Controller {
 	}
 
 	@FXML
+	private void openModeSelection(ActionEvent event) {
+		changeScreen("fxml-layouts/mode-selection.fxml/", event);
+	}
+
+	@FXML
 	private void openHomeScreen(ActionEvent event) {
 		changeScreen("fxml-layouts/main-screen.fxml/", event);
 	}
