@@ -11,6 +11,9 @@ Icon
 # Thumbnails
 ._*
 
+# IntelliJ IDEA IDE
+.idea/libraries/lib.xml/
+
 # Files that might appear in the root of a volume
 .DocumentRevisions-V100
 .fseventsd
@@ -148,3 +151,7 @@ local.properties
 .idea/*
 **/*.iml
 *.iml
+
+/out/
+out/*
+**/out/*
