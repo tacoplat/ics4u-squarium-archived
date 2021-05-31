@@ -51,9 +51,11 @@ public class ClassicEasyMain implements Initializable {
 
     public int top = 0;
 
+    private Tetromino tetromino;
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-    // public void start(Stage stage) throws Exception {
+        // public void start(Stage stage) throws Exception {
         for (int[] cells : grid) {
             Arrays.fill(cells, 0);
         }
@@ -71,8 +73,8 @@ public class ClassicEasyMain implements Initializable {
         level.setFill(Color.GREEN);
         group.getChildren().addAll(scoretext, line, level);
 
-         // Create first block and stage
-        Tetromino tetromino = nextObj;
+        // Create first block and stage
+        tetromino = nextObj;
         group.getChildren().addAll(tetromino.blocks[0], tetromino.blocks[1], tetromino.blocks[2], tetromino.blocks[3]);
         //moveOnKeyPress(tetromino);
         nextObj = GameController.makeRect();
@@ -81,61 +83,60 @@ public class ClassicEasyMain implements Initializable {
 //        stage.show();
 
         // Timer
-//        Timer fall = new Timer();
-//        TimerTask task = new TimerTask() {
-//            public void run() {
-//                Platform.runLater(new Runnable() {
-//                    public void run() {
-//                        for (int i = 0; i < object.blocks.length; i++) {
-//                            if (object.blocks[i].getY() == 0)
-//                                top++;
-//                            else
-//                                top = 0;
-//                        }
-//
-//                        if (top == 2) {
-//                            // GAME OVER -- MAKE SURE TO CHANGE LATER TO SWITCH TO GAMEOVER SCREEN
-//                            Text over = new Text("GAME OVER");
-//                            over.setFill(Color.RED);
-//                            over.setStyle("-fx-font: 70 arial;");
-//                            over.setY(250);
-//                            over.setX(10);
-//                            group.getChildren().add(over);
-//                            game = false;
-//                        }
-//                        // Exit
-//                        if (top == 15) {
-//                            System.exit(0);
-//                        }
-//
-////                        if (game) {
-////                            MoveDown(object);
-////                            scoretext.setText("Score: " + Integer.toString(score));
-////                            level.setText("Lines: " + Integer.toString(lineNum));
-////                        }
-//                    }
-//                });
-//            }
-//        };
-//
-//
-//        fall.schedule(task, 0, 300);  // period 300 is Speed 300
+        Timer fall = new Timer();
+        TimerTask task = new TimerTask() {
+            public void run() {
+                Platform.runLater(new Runnable() {
+                    public void run() {
+                        for (int i = 0; i < tetromino.blocks.length; i++) {
+                            if (tetromino.blocks[i].getY() == 0)
+                                top++;
+                            else
+                                top = 0;
+                        }
+
+                        if (top == 2) {
+                            // GAME OVER -- MAKE SURE TO CHANGE LATER TO SWITCH TO GAMEOVER SCREEN
+                            Text over = new Text("GAME OVER");
+                            over.setFill(Color.RED);
+                            over.setStyle("-fx-font: 70 arial;");
+                            over.setY(250);
+                            over.setX(10);
+                            group.getChildren().add(over);
+                            game = false;
+                        }
+                        // Exit
+                        if (top == 15) {
+                            System.exit(0);
+                        }
+
+//                        if (game) {
+//                            MoveDown(object);
+//                            scoretext.setText("Score: " + Integer.toString(score));
+//                            level.setText("Lines: " + Integer.toString(lineNum));
+//                      }
+                    }
+                });
+            }
+        };
+
+
+        fall.schedule(task, 0, 300);  // period 300 is Speed 300
 
     }
 
     // Handles arrow key press to move
-//    private void moveOnKeyPress(Tetromino tetromino) {
-//        scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
-//            public void handle(KeyEvent keyEvent) {
-//                switch (keyEvent.getCode()) {
-//                    case RIGHT:
-//                        GameController.move(tetromino, "right");
-//                        break;
-//                    case LEFT:
-//                        GameController.move(tetromino, "left");
-//                }
-//            }
-//        });
-//    }
+    @FXML
+    void keyPressed(KeyEvent event) {
+        switch (event.getCode()) {
+            case RIGHT:
+            case KP_RIGHT:
+                GameController.move(tetromino, "right");
+                break;
+            case LEFT:
+            case KP_LEFT:
+                GameController.move(tetromino, "left");
+        }
+    }
 
 }
