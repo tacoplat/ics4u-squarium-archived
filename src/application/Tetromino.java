@@ -6,28 +6,20 @@ import javafx.scene.shape.Rectangle;
 
 public class Tetromino {
     // Initialize each block/square making up tetromino piece
-    Rectangle a;
-    Rectangle b;
-    Rectangle c;
-    Rectangle d;
+    Rectangle[] blocks;
+
     Color color;
     // Name of tetromino piece based on their shape
     private String pieceName;
     public int orientation = 1;
 
     // Constructor
-    public Tetromino(Rectangle a, Rectangle b, Rectangle c, Rectangle d) {
-        this.a = a;
-        this.b = b;
-        this.c = c;
-        this.d = d;
+    public Tetromino(Rectangle[] blocks) {
+        this.blocks = blocks;
     }
 
-    public Tetromino(Rectangle a, Rectangle b, Rectangle c, Rectangle d, String pieceName) {
-        this.a = a;
-        this.b = b;
-        this.c = c;
-        this.d = d;
+    public Tetromino(Rectangle[] blocks, String pieceName) {
+        this.blocks = blocks;
         this.pieceName = pieceName;
     }
 
@@ -53,10 +45,11 @@ public class Tetromino {
                 break;
         }
 
-        this.a.setFill(color);
-        this.b.setFill(color);
-        this.c.setFill(color);
-        this.d.setFill(color);
+        // Set color for each block
+        for (int i = 0; i < blocks.length; i++) {
+            blocks[i].setFill(color);
+        }
+
     }
 
     // Getter
