@@ -45,7 +45,7 @@
                <children>
                   <Button mnemonicParsing="false" prefHeight="44.0" prefWidth="218.0" styleClass="main-button" text="Play" />
                   <Button fx:id="instructionsBtn" mnemonicParsing="false" onAction="#openInstructions" prefHeight="44.0" prefWidth="218.0" styleClass="main-button" text="Instructions" />
-                  <Button mnemonicParsing="false" prefHeight="44.0" prefWidth="218.0" styleClass="main-button" text="Scoreboard" />
+                  <Button mnemonicParsing="false" onAction="#openScoreboard" prefHeight="44.0" prefWidth="218.0" styleClass="main-button" text="Scoreboard" />
                </children>
                <padding>
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

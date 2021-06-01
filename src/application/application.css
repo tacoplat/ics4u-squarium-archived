@@ -79,3 +79,7 @@
   -fx-focus-color: transparent;
   -fx-faint-focus-color: transparent;
 }
+
+.table-column {
+  -fx-background-color: #A690F3;
+}
