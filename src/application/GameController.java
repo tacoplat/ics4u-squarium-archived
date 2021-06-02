@@ -112,17 +112,22 @@ public class GameController {
     // Moving the blocks
     public static void move(Tetromino tetromino, String direction) {
         // Checks to see if space tetromino is going to move to is outside of limit, if not then proceed
-        if (isOutside(tetromino.blocks)) {
+        if (!isOutside(tetromino.blocks)) {
             boolean moveable = true;
             int xLocation = 0;
+            int yLocation = 0;
             // Check to see if spot to move in the grid is empty (0) or occupied (1)
             for (int i = 0; i < tetromino.blocks.length; i++) {
+                xLocation = ((int) tetromino.blocks[i].getX() / SIZE);
+                yLocation = ((int) tetromino.blocks[i].getY() / SIZE);
                 if (direction == "right") {
-                    xLocation = ((int) tetromino.blocks[i].getX() / SIZE) + 1;
+                    xLocation += 1;
                 } else if (direction == "left") {
-                    xLocation = ((int) tetromino.blocks[i].getX() / SIZE) - 1;
+                    xLocation -= 1;
+                } else {
+                    yLocation += 1;
                 }
-                if (grid[xLocation][((int) tetromino.blocks[i].getY() / SIZE)] == 1) {
+                if (grid[xLocation][yLocation] == 1) {
                     moveable = false;
                     break;
                 }
@@ -135,10 +140,15 @@ public class GameController {
                 for (int i = 0; i < tetromino.blocks.length; i++) {
                     if (direction == "right") {
                         moveLocation = tetromino.blocks[i].getX() + MOVE;
+                        tetromino.blocks[i].setX(moveLocation);
                     } else if (direction == "left") {
                         moveLocation = tetromino.blocks[i].getX() - MOVE;
+                        tetromino.blocks[i].setX(moveLocation);
+                    } else {
+                        moveLocation = tetromino.blocks[i].getY() + MOVE;
+                        tetromino.blocks[i].setY(moveLocation);
                     }
-                    tetromino.blocks[i].setX(moveLocation);
+
                 }
             }
         }
