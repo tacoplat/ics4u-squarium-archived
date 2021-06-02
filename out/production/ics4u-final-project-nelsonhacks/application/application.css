@@ -47,10 +47,11 @@
   -fx-border-color: #242230;
   -fx-background-color: #FCD9E0;
   -fx-border-radius: 0.25em;
+  -fx-background-radius: 0.25em;
   -fx-text-fill: #242230;
 }
 
-.arrow-btns:hover, .arrow-btns:active {
+.arrow-btns:hover, .arrow-btns:active, .ab-active {
   -fx-background-color: #F7A1B2;
 }
 
@@ -80,6 +81,6 @@
   -fx-faint-focus-color: transparent;
 }
 
-.table-column {
+.table-view .column-header {
   -fx-background-color: #A690F3;
 }

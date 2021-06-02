@@ -25,28 +25,9 @@ public class Controller {
 	//Instance fields
 	FXMLLoader loader = new FXMLLoader();
 	URL fxmlURL;
-	private ObservableList<Scoreboard> scores =
-			FXCollections.observableArrayList(
-				new Scoreboard("Test", "Classic", 123),
-				new Scoreboard("Testa", "Classic", 124),
-				new Scoreboard("Testaa", "Classic", 125)
-			);
-
-	@FXML
-	private Label keyLabel;
-
-	@FXML
-	private Text keyDescription;
-
-	@FXML
-	private TableView<Scoreboard> scoreboardTable;
 
 	public static void main(String[] args) {
-		
 
-	}
-	
-	public void initialize() {
 
 	}
 
@@ -80,56 +61,6 @@ public class Controller {
 			System.out.println("Could not load the specified layout.");
 			e.printStackTrace();
 		}
-
-	}
-
-	/**
-	 * Sets the key descriptions on the instructions screen.
-	 *
-	 * @param event
-	 */
-	@FXML
-	private void setKeyDescription(ActionEvent event) {
-
-		// Get the FXML UserData property of the pressed button.
-		Node node = (Node) event.getSource();
-		String button = (String) node.getUserData();
-
-		String message = "";
-
-		// Set the message to display.
-		switch (button) {
-			case "up":
-				message = "Rotates the current shape clockwise.";
-				break;
-			case "down":
-				message = "Slowly drops the current shape downwards.";
-				break;
-			case "left":
-				message = "Moves the current shape to the left.";
-				break;
-			case "right":
-				message = "Moves the current shape to the right.";
-				break;
-			case "space":
-				message = "Drops the shape to the bottommost row instantaneously.";
-				break;
-			case "z":
-				message = "Rotates the current shape counter-clockwise.";
-				break;
-			case "x":
-				message = "Rotates the current shape clockwise.";
-				break;
-			case "c":
-				message = "Holds the current shape. One shape can be held in storage at any time.";
-				break;
-			default:
-				break;
-		}
-
-		// Update the screen elements.
-		keyLabel.setText("Controls: " + button.toUpperCase() + " key");
-		keyDescription.setText(message);
 
 	}
 
@@ -178,6 +109,5 @@ public class Controller {
 		System.out.println("Quitting application.");
 		Platform.exit();
 	}
-
 
 }

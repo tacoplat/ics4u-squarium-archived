@@ -7,7 +7,7 @@ public class Scoreboard {
     String mode;
     int score;
 
-    public Scoreboard(String nameIn, String modeIn, int scoreIn) {
+    public Scoreboard(String nameIn, String modeIn, Integer scoreIn) {
         playerName = nameIn;
         mode = modeIn;
         score = scoreIn;
