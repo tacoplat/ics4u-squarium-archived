@@ -1,157 +1,192 @@
 package application;
 
-import javafx.scene.shape.*;
+import javafx.application.Platform;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.scene.control.SplitPane;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
+import javafx.scene.text.Text;
 
-public class GameController {
+import java.net.URL;
+import java.util.Arrays;
+import java.util.ResourceBundle;
 
-    // Get numbers and grid from ClassicEasyMain class
-    public static final int MOVE = ClassicEasyMain.MOVE;
-    public static final int SIZE = ClassicEasyMain.SIZE;
-    public static final int XMAX = ClassicEasyMain.XMAX;
-    public static final int YMAX = ClassicEasyMain.YMAX;
-    public static int[][] grid = ClassicEasyMain.grid;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 
-    // Creating the squares/blocks that compose the tetromino
-    public static Tetromino makeRect() {
+public class GameController implements Initializable {
 
-        // Pick random color between 0-100
-        int randNum = (int) (Math.random() * 100);
-        String pieceName;
+    // Initialize variables
 
-        Rectangle[] blocks = new Rectangle[4];
-        for (int i = 0; i < blocks.length; i++) {
-            // Subtract 1 from size to create border/whitespace between each square so each individual square can be seen in tetromino
-            blocks[i] = new Rectangle(SIZE - 1, SIZE - 1);
-        }
+    @FXML
+    private SplitPane splitPane;
 
-        // If randomly generated number is less than 15, generate "j" piece
-        if (randNum < 15) {
-            pieceName = "j";
-            blocks[0].setX(XMAX / 2 - SIZE);
-            blocks[1].setX(XMAX / 2 - SIZE);
-            blocks[1].setY(SIZE);
-            blocks[2].setX(XMAX / 2);
-            blocks[2].setY(SIZE);
-            blocks[3].setX(XMAX / 2 + SIZE);
-            blocks[3].setY(SIZE);
+    @FXML
+    private AnchorPane leftPane;
 
-        } else if (randNum < 30) {
-            pieceName = "l";
-            blocks[0].setX(XMAX / 2 + SIZE);
-            blocks[1].setX(XMAX / 2 - SIZE);
-            blocks[1].setY(SIZE);
-            blocks[2].setX(XMAX / 2);
-            blocks[2].setY(SIZE);
-            blocks[3].setX(XMAX / 2 + SIZE);
-            blocks[3].setY(SIZE);
+    @FXML
+    private AnchorPane rightPane;
 
-        } else if (randNum < 45) {
-            pieceName = "o";
-            blocks[0].setX(XMAX / 2 - SIZE);
-            blocks[1].setX(XMAX / 2);
-            blocks[2].setX(XMAX / 2 - SIZE);
-            blocks[2].setY(SIZE);
-            blocks[3].setX(XMAX / 2);
-            blocks[3].setY(SIZE);
+    @FXML
+    private Button btnMove;
 
-        } else if (randNum < 60) {
-            pieceName = "s";
-            blocks[0].setX(XMAX / 2 + SIZE);
-            blocks[1].setX(XMAX / 2);
-            blocks[2].setX(XMAX / 2);
-            blocks[2].setY(SIZE);
-            blocks[3].setX(XMAX / 2 - SIZE);
-            blocks[3].setY(SIZE);
+    // private Scene scene = new Scene(group, XMAX + 150, YMAX); // Scene will have extra space on right for score, lines, etc
+    private boolean isRunning;
+    private  GameBoard gameBoard;
+    private Tetromino nextObj;
 
-        } else if (randNum < 75) {
-            pieceName = "t";
-            blocks[0].setX(XMAX / 2 - SIZE);
-            blocks[1].setX(XMAX / 2);
-            blocks[2].setX(XMAX / 2);
-            blocks[2].setY(SIZE);
-            blocks[3].setX(XMAX / 2 + SIZE);
+    // Counter for score and number of lines cleared
+    private int lineNum;
+    private int score;
 
-        } else if (randNum < 90) {
-            pieceName = "z";
-            blocks[0].setX(XMAX / 2 + SIZE);
-            blocks[1].setX(XMAX / 2);
-            blocks[2].setX(XMAX / 2 + SIZE);
-            blocks[2].setY(SIZE);
-            blocks[3].setX(XMAX / 2 + SIZE + SIZE);
-            blocks[3].setY(SIZE);
+    private int top;
 
-        } else {
-            pieceName = "i";
-            blocks[0].setX(XMAX / 2 - SIZE - SIZE);
-            blocks[1].setX(XMAX / 2 - SIZE);
-            blocks[2].setX(XMAX / 2);
-            blocks[3].setX(XMAX / 2 + SIZE);
+    private Tetromino tetromino;
 
-        }
+    // Timer counter
+    private int counter;
+    // Scheduled Executor Service to execute tasks repeatedly with a fixed interval of time
+    private ScheduledExecutorService ses;
+    // ScheduledFuture can be used to get time left before next task execution
+    private ScheduledFuture<?> scheduledFuture;
 
-        // Calls Tetromino constructor to create tetromino object
-        return new Tetromino(blocks, pieceName);
+    private boolean debug;
+
+    public GameController() {
+        debug = true;
+        top = 0;
+        score = 0;
+        lineNum = 0;
+        isRunning = true;
+        ses = Executors.newScheduledThreadPool(1);
+
+        gameBoard = new GameBoard();
+        nextObj = gameBoard.makeRect();
     }
 
-    public static boolean isOutside(Rectangle[] blocks) {
-        for (int i = 0; i < blocks.length; i++) {
-            if (blocks[i].getX() + MOVE > XMAX - SIZE) {
-                return true;
-            }
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        // public void start(Stage stage) throws Exception {
+        for (int[] cells : gameBoard.getGrid()) {
+            Arrays.fill(cells, 0);
         }
-        return false;
+
+        // Create score and level text
+        Line line = new Line(GameBoard.XMAX, 0, GameBoard.XMAX, GameBoard.YMAX); // Line separating game play screen and score/line count
+        Text scoretext = new Text("Score: ");
+        scoretext.setStyle("-fx-font: 20 arials;");
+        scoretext.setY(50);
+        scoretext.setX(GameBoard.XMAX + 5);
+        Text level = new Text("Lines: ");
+        level.setStyle("-fx-font: 20 arials;");
+        level.setY(100);
+        level.setX(GameBoard.XMAX + 5);
+        level.setFill(Color.GREEN);
+        rightPane.getChildren().addAll(scoretext, line, level);
+
+        // Create first block and stage
+        tetromino = nextObj;
+        leftPane.getChildren().addAll(tetromino.blocks[0], tetromino.blocks[1], tetromino.blocks[2], tetromino.blocks[3]);
+        //moveOnKeyPress(tetromino);
+        nextObj = gameBoard.makeRect();
+//        stage.setScene(scene);
+//        stage.setTitle("SILLY SHAPES - CLASSIC: EASY MODE");
+//        stage.show();
+
+        splitPane.setFocusTraversable(true);
+
+        try {
+            // Init delay = 0, repeat the task every 1 second
+            scheduledFuture = ses.scheduleAtFixedRate(taskUpdating, 0, 100, TimeUnit.MILLISECONDS);
+        }catch (Exception e){
+            System.out.println("Exception:" + e.getMessage());
+        }
+
     }
 
-    public static boolean isGridCellEmpty(int moveLocation) {
-        if (moveLocation == 0) {
-            return true;
-        }
-        return false;
-    }
+    /**
+     * Run the tasks with one millisecond delay
+     */
+    private Runnable taskUpdating = () -> {
+        counter++;
+        if(counter > 1000000) counter = 0;
 
-    // Moving the blocks
-    public static void move(Tetromino tetromino, String direction) {
-        // Checks to see if space tetromino is going to move to is outside of limit, if not then proceed
-        if (!isOutside(tetromino.blocks)) {
-            boolean moveable = true;
-            int xLocation = 0;
-            int yLocation = 0;
-            // Check to see if spot to move in the grid is empty (0) or occupied (1)
-            for (int i = 0; i < tetromino.blocks.length; i++) {
-                xLocation = ((int) tetromino.blocks[i].getX() / SIZE);
-                yLocation = ((int) tetromino.blocks[i].getY() / SIZE);
-                if (direction == "right") {
-                    xLocation += 1;
-                } else if (direction == "left") {
-                    xLocation -= 1;
-                } else {
-                    yLocation += 1;
-                }
-                if (grid[xLocation][yLocation] == 1) {
-                    moveable = false;
-                    break;
-                }
-            }
-
-            // If spot is empty, move all blocks
-            if (moveable) {
-                double moveLocation = 0;
-
+        // Run sort steps if autorun is enabled
+        // run one step per second or two steps per second if current step is greater than speed up step
+        if(counter%10 == 1) {
+            System.out.println("runnable --------------");
+            Platform.runLater(() -> {
                 for (int i = 0; i < tetromino.blocks.length; i++) {
-                    if (direction == "right") {
-                        moveLocation = tetromino.blocks[i].getX() + MOVE;
-                        tetromino.blocks[i].setX(moveLocation);
-                    } else if (direction == "left") {
-                        moveLocation = tetromino.blocks[i].getX() - MOVE;
-                        tetromino.blocks[i].setX(moveLocation);
-                    } else {
-                        moveLocation = tetromino.blocks[i].getY() + MOVE;
-                        tetromino.blocks[i].setY(moveLocation);
-                    }
-
+                    if (tetromino.blocks[i].getY() == 0)
+                        top++;
+                    else
+                        top = 0;
                 }
-            }
+
+                if (top == 2) {
+                    // GAME OVER -- MAKE SURE TO CHANGE LATER TO SWITCH TO GAMEOVER SCREEN
+                    Text over = new Text("GAME OVER");
+                    over.setFill(Color.RED);
+                    over.setStyle("-fx-font: 70 arial;");
+                    over.setY(250);
+                    over.setX(10);
+                    leftPane.getChildren().add(over);
+                    isRunning = false;
+                }
+                // Exit
+                if (top == 15) {
+                    System.exit(0);
+                }
+
+                if (isRunning) {
+                    // GameController.move(tetromino, "down");
+                    // scoretext.setText("Score: " + Integer.toString(score));
+                    // level.setText("Lines: " + Integer.toString(lineNum));
+                }
+            });
+        }
+    };
+
+    /**
+     * Shut down ScheduledExecutorService when the app is exited
+     */
+    public void shutdownSes(){
+        if(debug) System.out.println("Shutdown ScheduledExecutorService");
+        scheduledFuture.cancel(true);
+        ses.shutdown();
+    }
+
+
+    // Handles arrow key press to move
+    @FXML
+    void handleKeyPress(KeyEvent event) {
+        System.out.println("debug..." + event.getText());
+        switch (event.getCode()) {
+            case RIGHT:
+            case KP_RIGHT:
+                gameBoard.move(tetromino, "right");
+                break;
+            case LEFT:
+            case KP_LEFT:
+                gameBoard.move(tetromino, "left");
         }
     }
+//
+//    private void MoveTurn(Tetromino tetromino) {
+//        int t = tetromino.tetromino;
+//        Rectangle blocks;
+//        for (int i = 0; i < tetromino.blocks.length; i++) {
+//            blocks = tetromino.blocks[i];
+//        }
+//        switch (tetromino.getPieceName()) {
+//            if ((t == 1 &&) )
+//        }
+//    }
 
 }
