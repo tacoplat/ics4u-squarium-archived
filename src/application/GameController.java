@@ -77,19 +77,6 @@ public class GameController implements Initializable {
             Arrays.fill(cells, 0);
         }
 
-        // Create score and level text
-        Line line = new Line(GameBoard.XMAX, 0, GameBoard.XMAX, GameBoard.YMAX); // Line separating game play screen and score/line count
-        Text scoretext = new Text("Score: ");
-        scoretext.setStyle("-fx-font: 20 arials;");
-        scoretext.setY(50);
-        scoretext.setX(GameBoard.XMAX + 5);
-        Text level = new Text("Lines: ");
-        level.setStyle("-fx-font: 20 arials;");
-        level.setY(100);
-        level.setX(GameBoard.XMAX + 5);
-        level.setFill(Color.GREEN);
-        rightPane.getChildren().addAll(scoretext, line, level);
-
         // Create first block and stage
         tetromino = nextObj;
         leftPane.getChildren().addAll(tetromino.blocks[0], tetromino.blocks[1], tetromino.blocks[2], tetromino.blocks[3]);
@@ -145,9 +132,7 @@ public class GameController implements Initializable {
                 }
 
                 if (isRunning) {
-                    // GameController.move(tetromino, "down");
-                    // scoretext.setText("Score: " + Integer.toString(score));
-                    // level.setText("Lines: " + Integer.toString(lineNum));
+                    gameBoard.move(tetromino, "down");
                 }
             });
         }
@@ -175,6 +160,10 @@ public class GameController implements Initializable {
             case LEFT:
             case KP_LEFT:
                 gameBoard.move(tetromino, "left");
+                break;
+            case DOWN:
+            case KP_DOWN:
+                gameBoard.move(tetromino, "down");
         }
     }
 //

@@ -26,6 +26,10 @@ public class Main extends Application {
 
             scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
             primaryStage.setScene(scene);
+            primaryStage.setMinWidth(520);
+            primaryStage.setMinHeight(670);
+            primaryStage.setMaxWidth(520);
+            primaryStage.setMaxHeight(670);
             primaryStage.setTitle("Silly Shapes");
             primaryStage.show();
 

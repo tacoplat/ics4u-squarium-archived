@@ -21,6 +21,7 @@ public class Tetromino {
     public Tetromino(Rectangle[] blocks, String pieceName) {
         this.blocks = blocks;
         this.pieceName = pieceName;
+        this.setColor();
     }
 
     public void setColor() {
