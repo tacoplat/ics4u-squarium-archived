@@ -9,18 +9,22 @@ public class GameBoard {
     public static final int SIZE = 25;
     // Amount tetromino moves down (should be same as size)
     public static final int MOVE = 25;
+
+    public static final int WIDE = 12;
+    public static final int HIGH = 26;
+
     // Max length and witdh size of game screen
     public static final int XMAX = SIZE * 12;
-    public static final int YMAX = SIZE * 24;
+    public static final int YMAX = SIZE * 26;
 
     // Divides game screen into grid with the size each box of grid equal to SIZE
     private int[][] grid;
 
-    public GameBoard(){
+    public GameBoard() {
         grid = new int[XMAX / SIZE][YMAX / SIZE];
     }
 
-    public int[][] getGrid(){
+    public int[][] getGrid() {
         return grid;
     }
 
@@ -106,15 +110,6 @@ public class GameBoard {
         return new Tetromino(blocks, pieceName);
     }
 
-    public boolean isOutside(Rectangle[] blocks) {
-        for (int i = 0; i < blocks.length; i++) {
-            if (blocks[i].getX() + MOVE > XMAX - SIZE) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public boolean isGridCellEmpty(int moveLocation) {
         if (moveLocation == 0) {
             return true;
@@ -122,49 +117,62 @@ public class GameBoard {
         return false;
     }
 
-    // Moving the blocks
-    public void move(Tetromino tetromino, String direction) {
-        // Checks to see if space tetromino is going to move to is outside of limit, if not then proceed
-        if (!isOutside(tetromino.blocks)) {
-            boolean moveable = true;
-            int xLocation = 0;
-            int yLocation = 0;
-            // Check to see if spot to move in the grid is empty (0) or occupied (1)
-            for (int i = 0; i < tetromino.blocks.length; i++) {
-                xLocation = ((int) tetromino.blocks[i].getX() / SIZE);
-                yLocation = ((int) tetromino.blocks[i].getY() / SIZE);
-                if (direction == "right") {
-                    xLocation += 1;
-                } else if (direction == "left") {
-                    xLocation -= 1;
-                } else {
-                    yLocation += 1;
+    public boolean isMovable(Tetromino tetromino, String direction) {
+        int xLocation = 0;
+        int yLocation = 0;
+
+        // Check to see if spot to move in the grid is empty (0) or occupied (1)
+        for (int i = 0; i < tetromino.blocks.length; i++) {
+            xLocation = ((int) tetromino.blocks[i].getX() / SIZE);
+            yLocation = ((int) tetromino.blocks[i].getY() / SIZE);
+
+            if (direction == "right") {
+                xLocation += 1;
+                if (xLocation >= WIDE) {
+                    return false;
                 }
-                if (grid[xLocation][yLocation] == 1) {
-                    moveable = false;
-                    break;
+
+            } else if (direction == "left") {
+                xLocation -= 1;
+                if (xLocation < 0) {
+                    return false;
+                }
+            } else {
+                yLocation += 1;
+                if (yLocation >= HIGH) {
+                    return false;
                 }
             }
 
-            // If spot is empty, move all blocks
-            if (moveable) {
-                double moveLocation = 0;
+            // Check if other blocks exist at the move location
+            if (grid[xLocation][yLocation] == 1) {
+                return false;
+            }
+        }
 
-                for (int i = 0; i < tetromino.blocks.length; i++) {
-                    if (direction == "right") {
-                        moveLocation = tetromino.blocks[i].getX() + MOVE;
-                        tetromino.blocks[i].setX(moveLocation);
-                    } else if (direction == "left") {
-                        moveLocation = tetromino.blocks[i].getX() - MOVE;
-                        tetromino.blocks[i].setX(moveLocation);
-                    } else {
-                        moveLocation = tetromino.blocks[i].getY() + MOVE;
-                        tetromino.blocks[i].setY(moveLocation);
-                    }
+        return true;
+    }
 
+    // Moving the blocks
+    public void move(Tetromino tetromino, String direction) {
+        if (isMovable(tetromino, direction)) {
+            double moveLocation = 0;
+
+            for (int i = 0; i < tetromino.blocks.length; i++) {
+                if (direction == "right") {
+                    moveLocation = tetromino.blocks[i].getX() + MOVE;
+                    tetromino.blocks[i].setX(moveLocation);
+                } else if (direction == "left") {
+                    moveLocation = tetromino.blocks[i].getX() - MOVE;
+                    tetromino.blocks[i].setX(moveLocation);
+                } else {
+                    moveLocation = tetromino.blocks[i].getY() + MOVE;
+                    tetromino.blocks[i].setY(moveLocation);
                 }
+
             }
         }
     }
-
 }
+
+
