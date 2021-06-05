@@ -6,10 +6,13 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.SplitPane;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import org.w3c.dom.css.Rect;
 
 import java.net.URL;
 import java.util.Arrays;
@@ -34,11 +37,11 @@ public class GameController implements Initializable {
     private AnchorPane rightPane;
 
     @FXML
-    private Button btnMove;
+    private Button btnPlay;
 
     // private Scene scene = new Scene(group, XMAX + 150, YMAX); // Scene will have extra space on right for score, lines, etc
     private boolean isRunning;
-    private  GameBoard gameBoard;
+    private GameBoard gameBoard;
     private Tetromino nextObj;
 
     // Counter for score and number of lines cleared
@@ -63,38 +66,63 @@ public class GameController implements Initializable {
         top = 0;
         score = 0;
         lineNum = 0;
-        isRunning = true;
+        isRunning = false;
         ses = Executors.newScheduledThreadPool(1);
 
         gameBoard = new GameBoard();
-        nextObj = gameBoard.makeRect();
+        nextObj = new Tetromino();
     }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // public void start(Stage stage) throws Exception {
-        for (int[] cells : gameBoard.getGrid()) {
-            Arrays.fill(cells, 0);
-        }
-
-        // Create first block and stage
-        tetromino = nextObj;
-        leftPane.getChildren().addAll(tetromino.blocks[0], tetromino.blocks[1], tetromino.blocks[2], tetromino.blocks[3]);
-        //moveOnKeyPress(tetromino);
-        nextObj = gameBoard.makeRect();
-//        stage.setScene(scene);
-//        stage.setTitle("SILLY SHAPES - CLASSIC: EASY MODE");
-//        stage.show();
-
-        splitPane.setFocusTraversable(true);
 
         try {
-            // Init delay = 0, repeat the task every 1 second
+            // Init delay = 0, repeat the task every 100 millisecond
             scheduledFuture = ses.scheduleAtFixedRate(taskUpdating, 0, 100, TimeUnit.MILLISECONDS);
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println("Exception:" + e.getMessage());
         }
 
+        // Create first Tetromino
+        generateNextTetromino();
+    }
+
+    public void cleanupGrid(){
+        int[][] grid = gameBoard.getGrid();
+        Rectangle[][] filledBlocks = gameBoard.getFilledBlocks();
+        int top = GameBoard.HIGH;
+        for(int i=0; i<GameBoard.WIDE; i++){
+            if(Arrays.stream(grid[i]).anyMatch(idx -> idx == 1)) {
+                if(top == GameBoard.HIGH) top = i;
+                if (Arrays.stream(grid[i]).allMatch(idx -> idx == 1)) {
+                    // Delete the row and move the blocks on top one row down
+                    for (Rectangle block : filledBlocks[i]) {
+                        leftPane.getChildren().remove(block);
+                    }
+                    for(int k=i; k>=top; k--){
+                        for(Rectangle block: filledBlocks[k]){
+                           block.setY(block.getY() + Tetromino.SIZE);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void generateNextTetromino(){
+        if(tetromino != null){
+            // Add parked tetromino to the game board
+            gameBoard.addToGrid(tetromino);
+
+        }
+
+        tetromino = nextObj;
+        for (Rectangle block : tetromino.getBlocks()) {
+            leftPane.getChildren().add(block);
+        }
+
+        // Todo: Display the next Tetromino shape on the right Pane
+        nextObj = new Tetromino();
     }
 
     /**
@@ -102,22 +130,24 @@ public class GameController implements Initializable {
      */
     private Runnable taskUpdating = () -> {
         counter++;
-        if(counter > 1000000) counter = 0;
+        if (counter > 1000000) counter = 0;
 
         // Run sort steps if autorun is enabled
         // run one step per second or two steps per second if current step is greater than speed up step
-        if(counter%10 == 1) {
-            System.out.println("runnable --------------");
+        if (isRunning && counter % 10 == 1) {
+            if (debug) System.out.println("Moving --------------");
             Platform.runLater(() -> {
-                for (int i = 0; i < tetromino.blocks.length; i++) {
-                    if (tetromino.blocks[i].getY() == 0)
+                for (Rectangle block : tetromino.getBlocks()) {
+                    if (block.getY() == 0) {
                         top++;
-                    else
+                    } else {
                         top = 0;
+                    }
                 }
 
                 if (top == 2) {
                     // GAME OVER -- MAKE SURE TO CHANGE LATER TO SWITCH TO GAMEOVER SCREEN
+                    if (debug) System.out.println("GAME OVER --------------");
                     Text over = new Text("GAME OVER");
                     over.setFill(Color.RED);
                     over.setStyle("-fx-font: 70 arial;");
@@ -126,47 +156,76 @@ public class GameController implements Initializable {
                     leftPane.getChildren().add(over);
                     isRunning = false;
                 }
+
                 // Exit
                 if (top == 15) {
                     System.exit(0);
                 }
 
-                if (isRunning) {
-                    gameBoard.move(tetromino, "down");
+                int movable = tetromino.move(gameBoard.getGrid(), "down");
+                if(movable == 2 || movable == 3) {
+                    // Touched the bottom or other blocks
+                    // Generate new Tetromino
+                    generateNextTetromino();
                 }
             });
         }
     };
 
-    /**
-     * Shut down ScheduledExecutorService when the app is exited
-     */
-    public void shutdownSes(){
-        if(debug) System.out.println("Shutdown ScheduledExecutorService");
-        scheduledFuture.cancel(true);
-        ses.shutdown();
+    // Handles mouse click
+    @FXML
+    public void handleMouseClick(MouseEvent mouseEvent) {
+        isRunning = !isRunning;
+        if (isRunning) {
+            btnPlay.setText("PAUSE");
+        } else {
+            btnPlay.setText("PLAY");
+        }
     }
-
 
     // Handles arrow key press to move
     @FXML
-    void handleKeyPress(KeyEvent event) {
-        System.out.println("debug..." + event.getText());
+    public void handleKeyPress(KeyEvent event) {
+        int movable;
+        if (debug) System.out.println("debug..." + event.getText());
+        // https://openjfx.io/javadoc/16/javafx.graphics/javafx/scene/input/KeyCode.html
         switch (event.getCode()) {
-            case RIGHT:
-            case KP_RIGHT:
-                gameBoard.move(tetromino, "right");
+            case RIGHT:     // Non-numpad right arrow key pressed
+            case KP_RIGHT:  // Numeric keypad right arrow key pressed
+                if (isRunning) {
+                    tetromino.move(gameBoard.getGrid(), "right");
+                }
                 break;
-            case LEFT:
-            case KP_LEFT:
-                gameBoard.move(tetromino, "left");
+            case LEFT:      // Non-numpad left arrow key pressed
+            case KP_LEFT:   // Numeric keypad left arrow key pressed
+                if (isRunning) {
+                    tetromino.move(gameBoard.getGrid(), "left");
+                }
                 break;
-            case DOWN:
-            case KP_DOWN:
-                gameBoard.move(tetromino, "down");
+
+            case DOWN:     // Non-numpad down arrow key pressed
+            case KP_DOWN:  // Numeric keypad down arrow key pressed
+                if (isRunning) {
+                    movable = tetromino.move(gameBoard.getGrid(), "down");
+                    if (movable == 2 || movable == 3) {
+                        // Touched the bottom or other blocks
+                        // Generate new Tetromino
+                        generateNextTetromino();
+                    }
+                }
+                break;
+            case ENTER:    // Enter key pressed
+                isRunning = !isRunning;
+                if (isRunning) {
+                    btnPlay.setText("PAUSE");
+                } else {
+                    btnPlay.setText("PLAY");
+                }
+                break;
         }
     }
-//
+
+
 //    private void MoveTurn(Tetromino tetromino) {
 //        int t = tetromino.tetromino;
 //        Rectangle blocks;

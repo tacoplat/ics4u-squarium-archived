@@ -4,12 +4,12 @@
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<SplitPane fx:id="splitPane" dividerPositions="0.7692901234567902" maxHeight="650.0" maxWidth="520.0" minHeight="650.0" minWidth="520.0" prefHeight="650.0" prefWidth="520.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.GameController">
+<SplitPane fx:id="splitPane" dividerPositions="0.7692901234567902" maxHeight="670.0" maxWidth="520.0" minHeight="670.0" minWidth="520.0" prefHeight="670.0" prefWidth="520.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.GameController">
   <items>
     <AnchorPane fx:id="leftPane" maxHeight="650.0" maxWidth="300.0" minHeight="650.0" minWidth="300.0" prefHeight="650.0" prefWidth="300.0" />
     <AnchorPane fx:id="rightPane" maxHeight="650.0" maxWidth="200.0" minHeight="650.0" minWidth="200.0" prefHeight="650.0" prefWidth="200.0">
          <children>
-            <Button fx:id="btnMove" layoutX="37.0" layoutY="334.0" mnemonicParsing="false" onKeyPressed="#handleKeyPress" text="Button" />
+            <Button fx:id="btnPlay" layoutX="34.0" layoutY="549.0" mnemonicParsing="false" onKeyPressed="#handleKeyPress" onMouseClicked="#handleMouseClick" prefHeight="50.0" prefWidth="132.0" styleClass="main-button" text="PLAY" />
          </children></AnchorPane>
   </items>
 </SplitPane>
