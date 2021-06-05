@@ -41,12 +41,17 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <VBox prefHeight="640.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.InstructionsController">
   <children>
     <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
          <children>
-            <Button layoutX="19.0" layoutY="20.0" mnemonicParsing="false" onAction="#openHomeScreen" prefHeight="40.0" prefWidth="40.0" styleClass="mini-button-round" />
+             <Button layoutX="19.0" layoutY="20.0" mnemonicParsing="false" onAction="#openHomeScreen" prefHeight="40.0" prefWidth="40.0" styleClass="mini-button-round">
+                 <graphic>
+                     <FontIcon boundsType="VISUAL" iconColor="WHITE" iconLiteral="mdi-arrow-left-bold" iconSize="30" layoutX="20.0" layoutY="50.0" selectionStart="0" textAlignment="CENTER" />
+                 </graphic>
+             </Button>
             <Text layoutX="133.0" layoutY="49.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-size: 24px; -fx-text-fill: #242230; -fx-font-weight: bold;" text="Instructions" />
             <TabPane layoutX="36.0" layoutY="320.0" prefHeight="290.0" prefWidth="326.0" style="-fx-border-color: #242230;" tabClosingPolicy="UNAVAILABLE">
               <tabs>
@@ -76,7 +81,14 @@
                 </Tab>
                   <Tab text="Lock">
                      <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="324.0" styleClass="anchor-pane" />
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="324.0" styleClass="anchor-pane">
+                           <children>
+                              <Text layoutX="12.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="In the Lock mode, the standard controls are in effect. Classic rules apply for scoring.&#10;&#10;At the start of the game, a shape will appear at the top of the screen. The player must arrange these shapes, one-by-one, within the box, to form rows. For every row cleared, the player will gain score points. Gradually, shapes will begin to spawn faster and faster. The game will limit shape spawning to a specific shape for time intervals of 15s.&#10;&#10;Once the shape exceeds the constraints of the box, the game is lost." wrappingWidth="300.0">
+                                 <font>
+                                    <Font name="Noto Sans Regular" size="12.0" />
+                                 </font>
+                              </Text>
+                           </children></AnchorPane>
                      </content>
                   </Tab>
               </tabs>

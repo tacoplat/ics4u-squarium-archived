@@ -39,6 +39,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <VBox prefHeight="400.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.ScoreboardController">
   <children>
@@ -55,8 +56,12 @@
                </columnResizePolicy>
             </TableView>
             <Text layoutX="185.0" layoutY="52.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-size: 24px; -fx-text-fill: #242230; -fx-font-weight: bold;" text="Scoreboard" />
-            <Button layoutX="30.0" layoutY="24.0" mnemonicParsing="false" onAction="#openHomeScreen" prefHeight="40.0" prefWidth="40.0" styleClass="mini-button-round" />
-            <Button layoutX="400.0" layoutY="30.0" mnemonicParsing="false" onAction="#resetScoreboard" prefHeight="28.0" prefWidth="49.0" text="Reset" textAlignment="CENTER" wrapText="true">
+          <Button layoutX="30.0" layoutY="24.0" mnemonicParsing="false" onAction="#openHomeScreen" prefHeight="40.0" prefWidth="40.0" styleClass="mini-button-round" >
+              <graphic>
+                  <FontIcon boundsType="VISUAL" iconColor="WHITE" iconLiteral="mdi-arrow-left-bold" iconSize="30" layoutX="34.0" layoutY="55.0" selectionStart="0" textAlignment="CENTER" />
+              </graphic>
+          </Button>
+            <Button layoutX="400.0" layoutY="30.0" mnemonicParsing="false" onAction="#resetScoreboard" prefHeight="28.0" prefWidth="49.0" style="-fx-background-color: #3D15CB; -fx-text-fill: white; -fx-border-radius: 1.8em; -fx-background-radius: 1.8em;" text="Reset" textAlignment="CENTER" wrapText="true">
                <font>
                   <Font size="10.0" />
                </font>

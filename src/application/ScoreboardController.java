@@ -4,18 +4,18 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.io.*;
+import java.util.Optional;
 
 public class ScoreboardController extends Controller {
 
     // Instance fields
     private ObservableList<Scoreboard> scores =
             FXCollections.observableArrayList();
-    private static String defaultScoreboardPath = "src/application/appdata/score.save";
+    private static String defaultScoreboardPath = "src/application/appdata/";
     private boolean debug = false;
 
     // FXML Id references
@@ -48,7 +48,7 @@ public class ScoreboardController extends Controller {
         scoreboardTable.setFixedCellSize(24);
 
         // Update the scoreboard from the save file & sort entries descending by score.
-        obtainScoresFromFile(defaultScoreboardPath);
+        obtainScoresFromFile(defaultScoreboardPath + "/score.save");
         sortScoreboard(scores);
     }
 
@@ -58,7 +58,43 @@ public class ScoreboardController extends Controller {
      */
     @FXML
     private void resetScoreboard(ActionEvent event) {
-        eraseScores(defaultScoreboardPath);
+
+        // Set up a confirmation dialog.
+        Alert dialog = new Alert(Alert.AlertType.CONFIRMATION);
+        dialog.setTitle("Erase Scores");
+        dialog.setContentText("Are you sure you want to erase the scoreboard?\nThis action cannot be reverted.");
+
+        dialog.setHeaderText(null);
+        dialog.setGraphic(null);
+
+        ((Button) dialog.getDialogPane().lookupButton(ButtonType.OK)).setText("Erase"); // Relabel the ok button.
+
+        Optional<ButtonType> result = dialog.showAndWait();
+
+        // Button actions.
+        if (result.get() == ButtonType.OK) {
+            eraseScores(defaultScoreboardPath + "/score.save"); // Erase the scoreboard.
+            System.out.println("Scoreboard erased.");
+        } else {
+            dialog.close();
+            System.out.println("User cancelled action.");
+        }
+    }
+
+    /**
+     * Sets the default score file path.
+     * @param pathIn - The specified file path.
+     */
+    public static void setDefaultScoreboardPath(String pathIn) {
+        defaultScoreboardPath = pathIn;
+    }
+
+    /**
+     * Gets the default score file path.
+     * @return The path to the save file.
+     */
+    public static String getDefaultScoreboardPath() {
+        return defaultScoreboardPath;
     }
 
     /**
@@ -87,7 +123,7 @@ public class ScoreboardController extends Controller {
     public static void writeScoreToFile(String playerNameIn, String modeIn, Integer scoreIn) {
         try {
             // Append the information (separated by delimiters) to the file.
-            FileWriter fw = new FileWriter(defaultScoreboardPath, true);
+            FileWriter fw = new FileWriter(defaultScoreboardPath + "/score.save", true);
             String entry = "\n" + playerNameIn + ">%" + modeIn + ">%" + String.valueOf(scoreIn);
 
             fw.write(entry);
@@ -126,10 +162,45 @@ public class ScoreboardController extends Controller {
 
         } catch (FileNotFoundException e) {
             System.out.println("Cannot locate scoreboard file.");
-            e.printStackTrace();
+            newScoreFile(path);
         } catch (IOException e) {
             System.out.println("Could not read from the file.");
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Shows a dialog that prompts the user to create a new score file.
+     * @param path - The path of the file.
+     */
+    private void newScoreFile(String path) {
+
+        // Set up a confirmation dialog.
+        Alert dialog = new Alert(Alert.AlertType.CONFIRMATION);
+        dialog.setTitle("Missing Score File");
+        dialog.setContentText("Could not locate the score file. Create a new one?");
+
+        dialog.setHeaderText(null);
+        dialog.setGraphic(null);
+
+        ((Button) dialog.getDialogPane().lookupButton(ButtonType.OK)).setText("Yes"); // Relabel the ok button.
+        ((Button) dialog.getDialogPane().lookupButton(ButtonType.CANCEL)).setText("No"); // Relabel the cancel button.
+
+        Optional<ButtonType> result = dialog.showAndWait(); // Show dialog.
+
+        // Button actions.
+        if (result.get() == ButtonType.OK) {
+            File newScoreFile = new File(path);
+            try {
+                newScoreFile.createNewFile(); // Attempt to create the new file.
+            } catch (IOException e) {
+                System.out.println("File already exists.");
+                e.printStackTrace();
+            }
+            System.out.println("Score file created.");
+        } else {
+            dialog.close();
+            System.out.println("User cancelled action.");
         }
     }
 

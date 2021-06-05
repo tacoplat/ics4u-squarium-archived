@@ -1,12 +1,9 @@
 package application;
 
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -20,6 +17,11 @@ import java.util.List;
 
 public class InstructionsController extends Controller {
 
+    // Instance fields.
+    private List<Button> btnList;
+    private int currentInd = 0;
+
+    // FXML Id elements
     @FXML
     private Label keyLabel;
 
@@ -35,10 +37,11 @@ public class InstructionsController extends Controller {
     @FXML private Button ctrlBtnC;
     @FXML private Button ctrlBtnSPACE;
 
-    private List<Button> btnList;
-    private int currentInd = 0;
-
+    /**
+     * Default initialize method for JavaFX.
+     */
     public void initialize() {
+        // Schedule a task to run after the program initializes.
         Platform.runLater(
                 new Runnable() {
                     @Override
@@ -56,24 +59,31 @@ public class InstructionsController extends Controller {
         );
     }
 
-    @FXML
+    /**
+     * Wrapper method that sets keybinds for instructions screen.
+     */
     private void setKeyPressHandlers() {
         Scene scene = ctrlBtnUP.getScene();
-        
+
+        // Add event listeners.
         scene.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
 
+            // Remove current active button style.
             btnList.get(currentInd).getStyleClass().remove("ab-active");
 
             assignIndex(e);
 
+            // Trigger the selected button's onAction and add the active style.
             btnList.get(currentInd).fire();
             btnList.get(currentInd).getStyleClass().add("ab-active");
             e.consume();
         });
-
-
     }
 
+    /**
+     * Assigns the index variable (for keybind purposes).
+     * @param e - A KeyEvent event
+     */
     private void assignIndex(KeyEvent e) {
         if (e.getCode() == KeyCode.UP) currentInd = 0;
         else if (e.getCode() == KeyCode.LEFT) currentInd = 1;

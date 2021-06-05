@@ -84,3 +84,7 @@
 .table-view .column-header {
   -fx-background-color: #A690F3;
 }
+
+.button-icon {
+  pointer-events: false;
+}

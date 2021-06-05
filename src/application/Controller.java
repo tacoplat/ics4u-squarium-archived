@@ -1,35 +1,34 @@
 package application;
 
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.text.Text;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Optional;
 
 public class Controller {
 
-	//Instance fields
+	// Instance fields
 	FXMLLoader loader = new FXMLLoader();
 	URL fxmlURL;
-
-	public static void main(String[] args) {
-
-
-	}
+	public String[][] appInformation = {
+			{"Author(s)", "NelsonHacks [C. Zhang, A. Zhen]"},
+			{"App Name", ""},
+			{"Version", "1.0"}
+	};
 
 	/**
 	 * Changes the current scene to another FXML layout.
@@ -43,7 +42,7 @@ public class Controller {
 		fxmlURL = this.getClass().getResource(path);
 
 		// Get the references of the scene and stage of the pressed button.
-		Scene scene = ((Button) event.getTarget()).getScene();
+		Scene scene = ((Node) event.getTarget()).getScene();
 		Stage stage = (Stage) scene.getWindow();
 
 		try {
@@ -106,8 +105,82 @@ public class Controller {
 	 */
 	@FXML
 	private void quitApplication(ActionEvent event) {
-		System.out.println("Quitting application.");
-		Platform.exit();
+
+		// Set up a confirmation dialog.
+		Alert dialog = new Alert(Alert.AlertType.CONFIRMATION);
+		dialog.setTitle("Quit Game");
+		dialog.setContentText("Are you sure you want to close the application?");
+
+		dialog.setHeaderText(null);
+		dialog.setGraphic(null);
+
+		((Button) dialog.getDialogPane().lookupButton(ButtonType.OK)).setText("Quit"); // Relabel the ok button.
+
+		Optional<ButtonType> result = dialog.showAndWait();
+
+		// Button actions.
+		if (result.get() == ButtonType.OK) {
+			Platform.exit();
+			System.out.println("Quitting application.");
+		} else {
+			dialog.close();
+			System.out.println("User cancelled action.");
+		}
+	}
+
+	/**
+	 * Displays a dialog to show the app info, as well as some simple settings.
+	 * @param event
+	 */
+	@FXML
+	private void showAppInfo(ActionEvent event) {
+		// Configure new confirmation dialog.
+		Alert dialog = new Alert(Alert.AlertType.CONFIRMATION);
+		dialog.setTitle("App Information");
+		dialog.setContentText(
+				appInformation[0][0] + ": " + appInformation[0][1] + "\n" +
+				appInformation[1][0] + ": " + appInformation[1][1] + "\n" +
+				appInformation[2][0] + ": " + appInformation[2][1] + "\n"
+		);
+
+		dialog.setHeaderText(null);
+		dialog.setGraphic(null);
+
+		ButtonType changePath = new ButtonType("Change Save Path");
+		ButtonType close = ButtonType.CLOSE;
+
+		dialog.getButtonTypes().setAll(changePath, close);
+
+		Optional<ButtonType> result = dialog.showAndWait(); // Show dialog and wait for response.
+		if (result.get() == changePath) {
+			pathChange(event);
+		} else if (result.get() == close) {
+			dialog.close();
+		}
+	}
+
+	/**
+	 * Opens a dialog to set the game's default data directory.
+	 * @param event
+	 */
+	private void pathChange(ActionEvent event) {
+
+		// Get the current Stage.
+		Stage currentStage = (Stage) ((Node) event.getTarget()).getScene().getWindow();
+
+		// Configure a DirectoryChooser.
+		DirectoryChooser dc = new DirectoryChooser();
+		dc.setTitle("Set Default Game Save Path");
+		dc.setInitialDirectory(new File(ScoreboardController.getDefaultScoreboardPath()));
+
+		try {
+			// Try to set the directory.
+			File directory = dc.showDialog(currentStage);
+			ScoreboardController.setDefaultScoreboardPath(directory.getAbsolutePath());
+			System.out.println("Game save directory set to " + directory.getAbsolutePath());
+		} catch (NullPointerException e) {
+			System.out.println("User did not choose a file.");
+		}
 	}
 
 }
