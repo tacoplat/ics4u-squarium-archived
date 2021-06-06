@@ -10,7 +10,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
@@ -22,8 +21,8 @@ import java.util.Optional;
 public class Controller {
 
 	// Instance fields
-	FXMLLoader loader = new FXMLLoader();
 	URL fxmlURL;
+	public static Profile currentProfile;
 	public String[][] appInformation = {
 			{"Author(s)", "NelsonHacks [C. Zhang, A. Zhen]"},
 			{"App Name", ""},
@@ -34,9 +33,9 @@ public class Controller {
 	 * Changes the current scene to another FXML layout.
 	 *
 	 * @param path - The path to the FXML layout.
-	 * @param event
+	 * @param event - JavaFX ActionEvent
 	 */
-	private void changeScreen(String path, ActionEvent event) {
+	public void changeScreen(String path, ActionEvent event) {
 
 		// Set the target path to the input from the parameter.
 		fxmlURL = this.getClass().getResource(path);
@@ -47,7 +46,7 @@ public class Controller {
 
 		try {
 			// Load the new layout into a new root element.
-			Parent root = loader.load(fxmlURL);
+			Parent root = FXMLLoader.load(fxmlURL);
 
 			// Create a new scene and set the root and stylesheet.
 			Scene newScene = new Scene(root);
@@ -65,7 +64,7 @@ public class Controller {
 
 	/**
 	 * Opens the instructions page.
-	 * @param event
+	 * @param event - JavaFX ActionEvent
 	 */
 	@FXML
 	private void openInstructions(ActionEvent event) {
@@ -74,7 +73,7 @@ public class Controller {
 
 	/**
 	 * Opens the title screen.
-	 * @param event
+	 * @param event - JavaFX ActionEvent
 	 */
 	@FXML
 	private void openHomeScreen(ActionEvent event) {
@@ -82,8 +81,8 @@ public class Controller {
 	}
 
 	/**
-	 * Opens the sccoreboard.
-	 * @param event
+	 * Opens the scoreboard.
+	 * @param event - JavaFX ActionEvent
 	 */
 	@FXML
 	private void openScoreboard(ActionEvent event) {
@@ -92,19 +91,18 @@ public class Controller {
 
 	/**
 	 * Opens the Game Over screen.
-	 * @param event
+	 * @param event - JavaFX ActionEvent
 	 */
 	@FXML
-	private void openGameOver(ActionEvent event) {
+	public void openGameOver(ActionEvent event) {
 		changeScreen("fxml-layouts/game-over.fxml/", event);
 	}
 
 	/**
 	 * Exits the application.
-	 * @param event
 	 */
 	@FXML
-	private void quitApplication(ActionEvent event) {
+	private void quitApplication() {
 
 		// Set up a confirmation dialog.
 		Alert dialog = new Alert(Alert.AlertType.CONFIRMATION);
@@ -119,7 +117,7 @@ public class Controller {
 		Optional<ButtonType> result = dialog.showAndWait();
 
 		// Button actions.
-		if (result.get() == ButtonType.OK) {
+		if (result.isPresent() && result.get() == ButtonType.OK) {
 			Platform.exit();
 			System.out.println("Quitting application.");
 		} else {
@@ -130,7 +128,7 @@ public class Controller {
 
 	/**
 	 * Displays a dialog to show the app info, as well as some simple settings.
-	 * @param event
+	 * @param event - JavaFX ActionEvent
 	 */
 	@FXML
 	private void showAppInfo(ActionEvent event) {
@@ -140,28 +138,34 @@ public class Controller {
 		dialog.setContentText(
 				appInformation[0][0] + ": " + appInformation[0][1] + "\n" +
 				appInformation[1][0] + ": " + appInformation[1][1] + "\n" +
-				appInformation[2][0] + ": " + appInformation[2][1] + "\n"
+				appInformation[2][0] + ": " + appInformation[2][1] + "\n" +
+				"Current Profile: " + currentProfile.getPlayerName() + " (ID: " + currentProfile.getId() + ")"
 		);
 
 		dialog.setHeaderText(null);
 		dialog.setGraphic(null);
 
 		ButtonType changePath = new ButtonType("Change Save Path");
+		ButtonType changeProfile = new ButtonType("Change Profile");
 		ButtonType close = ButtonType.CLOSE;
 
-		dialog.getButtonTypes().setAll(changePath, close);
+		dialog.getButtonTypes().setAll(changePath, changeProfile, close);
 
 		Optional<ButtonType> result = dialog.showAndWait(); // Show dialog and wait for response.
-		if (result.get() == changePath) {
-			pathChange(event);
-		} else if (result.get() == close) {
-			dialog.close();
+		if (result.isPresent()) {
+			if (result.get() == changePath) {
+				pathChange(event);
+			} else if (result.get() == changeProfile) {
+				changeScreen("fxml-layouts/profile-select.fxml/", event);
+			} else if (result.get() == close) {
+				dialog.close();
+			}
 		}
 	}
 
 	/**
 	 * Opens a dialog to set the game's default data directory.
-	 * @param event
+	 * @param event - JavaFX ActionEvent
 	 */
 	private void pathChange(ActionEvent event) {
 
@@ -183,4 +187,19 @@ public class Controller {
 		}
 	}
 
+	/**
+	 * Set the current profile.
+	 * @param profileIn - The current profile.
+	 */
+	public static void setProfile(Profile profileIn) {
+		currentProfile = profileIn;
+	}
+
+	/**
+	 * Get the ID of the current profile.
+	 * @return The current profile's ID.
+	 */
+	public static Integer getCurrentProfileId() {
+		return currentProfile.getId();
+	}
 }

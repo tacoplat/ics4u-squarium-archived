@@ -2,7 +2,6 @@ package application;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -16,20 +15,15 @@ public class ScoreboardController extends Controller {
     private ObservableList<Scoreboard> scores =
             FXCollections.observableArrayList();
     private static String defaultScoreboardPath = "src/application/appdata/";
-    private boolean debug = false;
+    private final boolean debug = false;
 
     // FXML Id references
     @FXML
     private TableView<Scoreboard> scoreboardTable;
 
-    @FXML
-    private TableColumn<Scoreboard, String> col0;
-
-    @FXML
-    private TableColumn<Scoreboard, String> col1;
-
-    @FXML
-    private TableColumn<Scoreboard, Integer> col2;
+    @FXML private TableColumn<Scoreboard, String> col0;
+    @FXML private TableColumn<Scoreboard, String> col1;
+    @FXML private TableColumn<Scoreboard, Integer> col2;
 
     /**
      * The default JavaFX initialize method.
@@ -37,11 +31,11 @@ public class ScoreboardController extends Controller {
     public void initialize() {
 
         // Configure the table columns to hold the scoreboard data and styles.
-        col0.setCellValueFactory(new PropertyValueFactory<Scoreboard, String>("playerName"));
+        col0.setCellValueFactory(new PropertyValueFactory<>("playerName"));
         col0.setReorderable(false);
-        col1.setCellValueFactory(new PropertyValueFactory<Scoreboard, String>("mode"));
+        col1.setCellValueFactory(new PropertyValueFactory<>("mode"));
         col1.setReorderable(false);
-        col2.setCellValueFactory(new PropertyValueFactory<Scoreboard, Integer>("score"));
+        col2.setCellValueFactory(new PropertyValueFactory<>("score"));
         col2.setReorderable(false);
 
         scoreboardTable.setItems(scores);
@@ -54,10 +48,9 @@ public class ScoreboardController extends Controller {
 
     /**
      * Handles the reset button press.
-     * @param event
      */
     @FXML
-    private void resetScoreboard(ActionEvent event) {
+    private void resetScoreboard() {
 
         // Set up a confirmation dialog.
         Alert dialog = new Alert(Alert.AlertType.CONFIRMATION);
@@ -72,7 +65,7 @@ public class ScoreboardController extends Controller {
         Optional<ButtonType> result = dialog.showAndWait();
 
         // Button actions.
-        if (result.get() == ButtonType.OK) {
+        if (result.isPresent() && result.get() == ButtonType.OK) {
             eraseScores(defaultScoreboardPath + "/score.save"); // Erase the scoreboard.
             System.out.println("Scoreboard erased.");
         } else {
@@ -87,6 +80,7 @@ public class ScoreboardController extends Controller {
      */
     public static void setDefaultScoreboardPath(String pathIn) {
         defaultScoreboardPath = pathIn;
+        ProfileController.setDefaultProfilePath(pathIn);
     }
 
     /**
@@ -124,7 +118,7 @@ public class ScoreboardController extends Controller {
         try {
             // Append the information (separated by delimiters) to the file.
             FileWriter fw = new FileWriter(defaultScoreboardPath + "/score.save", true);
-            String entry = "\n" + playerNameIn + ">%" + modeIn + ">%" + String.valueOf(scoreIn);
+            String entry = "\n" + playerNameIn + ">%" + modeIn + ">%" + scoreIn;
 
             fw.write(entry);
             fw.close();
@@ -189,7 +183,7 @@ public class ScoreboardController extends Controller {
         Optional<ButtonType> result = dialog.showAndWait(); // Show dialog.
 
         // Button actions.
-        if (result.get() == ButtonType.OK) {
+        if (result.isPresent() && result.get() == ButtonType.OK) {
             File newScoreFile = new File(path);
             try {
                 newScoreFile.createNewFile(); // Attempt to create the new file.

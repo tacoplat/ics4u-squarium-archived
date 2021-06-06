@@ -146,3 +146,5 @@ local.properties
 # Typically, this file would be tracked if it contains build/dependency configurations:
 .project
 *.save
+out/production/ics4u-final-project-nelsonhacks/application/appdata/score.save
+*.save

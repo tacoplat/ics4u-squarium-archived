@@ -43,18 +43,15 @@ public class InstructionsController extends Controller {
     public void initialize() {
         // Schedule a task to run after the program initializes.
         Platform.runLater(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        setKeyPressHandlers();
+                () -> {
+                    setKeyPressHandlers();
 
-                        btnList = new ArrayList<Button>(
-                                Arrays.asList(
-                                        ctrlBtnUP, ctrlBtnLEFT, ctrlBtnDOWN, ctrlBtnRIGHT,
-                                        ctrlBtnZ, ctrlBtnX, ctrlBtnC, ctrlBtnSPACE
-                                )
-                        );
-                    }
+                    btnList = new ArrayList<>(
+                            Arrays.asList(
+                                    ctrlBtnUP, ctrlBtnLEFT, ctrlBtnDOWN, ctrlBtnRIGHT,
+                                    ctrlBtnZ, ctrlBtnX, ctrlBtnC, ctrlBtnSPACE
+                            )
+                    );
                 }
         );
     }
@@ -98,7 +95,7 @@ public class InstructionsController extends Controller {
     /**
      * Sets the key descriptions on the instructions screen.
      *
-     * @param event
+     * @param event JavaFX ActionEvent
      */
     @FXML
     private void setKeyDescription(ActionEvent event) {
