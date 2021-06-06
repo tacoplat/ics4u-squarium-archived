@@ -20,17 +20,17 @@ public class GameBoard {
     private int[][] grid;
     private Rectangle[][] filledBlocks;
 
-    public static int getPositionX(Rectangle block){
+    public static int getRowIndex(Rectangle block){
         return ((int)block.getX() / Tetromino.SIZE);
     }
 
-    public static int getPositionY(Rectangle block){
+    public static int getColunmIndex(Rectangle block){
         return ((int)block.getY() / Tetromino.SIZE);
     }
 
     public GameBoard() {
-        grid = new int[WIDE][HIGH];
-        filledBlocks = new Rectangle[WIDE][HIGH];
+        grid = new int[HIGH][WIDE];
+        filledBlocks = new Rectangle[HIGH][WIDE];
     }
 
     public int[][] getGrid() {
@@ -44,10 +44,10 @@ public class GameBoard {
     public void addToGrid(Tetromino parked){
         Rectangle[] parkedBlocks = parked.getBlocks();
         for (Rectangle block: parkedBlocks) {
-            int xPosition = GameBoard.getPositionX(block);
-            int yPosition = GameBoard.getPositionY(block);
-            grid[xPosition][yPosition] = 1;
-            filledBlocks[xPosition][yPosition] = block;
+            int row = GameBoard.getRowIndex(block);
+            int column = GameBoard.getColunmIndex(block);
+            grid[column][row] = 1;
+            filledBlocks[column][row] = block;
         }
     }
 }
