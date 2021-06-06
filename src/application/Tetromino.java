@@ -119,29 +119,6 @@ public class Tetromino {
 
     // Set color of each rectangle making up tetromino
     public void setColor() {
-//        switch (pieceName) {
-//            case "j":
-//                color = Color.SLATEGRAY;
-//                break;
-//            case "l":
-//                color = Color.DARKGOLDENROD;
-//                break;
-//            case "o":
-//                color = Color.INDIANRED;
-//                break;
-//            case "s":
-//                color = Color.FORESTGREEN;
-//                break;
-//            case "t":
-//                color = Color.DARKBLUE;
-//                break;
-//            case "z":
-//                color = Color.HOTPINK;
-//                break;
-//            case "i":
-//                color = Color.CYAN;
-//                break;
-//        }
 
         switch (pieceName) {
             case "j":
@@ -171,7 +148,6 @@ public class Tetromino {
         for (int i = 0; i < blocks.length; i++) {
             blocks[i].setFill(color);
         }
-
     }
 
     /**
@@ -568,57 +544,6 @@ public class Tetromino {
                 break;
         }
     }
-
-//    public void changeOrientation(boolean clockwise) {
-//        double baseX = 0.0;
-//        double baseY = 0.0;
-//
-//        double angle = clockwise ? 90.0 : -90.0;
-//        orientation = clockwise ? orientation + 1 : orientation - 1;
-//        if (orientation > 3) {
-//            orientation = 1;
-//        } else if (orientation < 0) {
-//            orientation = 3;
-//        }
-//
-//        switch (pieceName) {
-//            case "j":
-//            case "l":
-//            case "s":
-//                baseX = blocks[2].getX() + SIZE / 2.0;
-//                baseY = blocks[2].getY() + SIZE / 2.0;
-//                break;
-//            case "t":
-//                baseX = blocks[1].getX() + SIZE / 2.0;
-//                baseY = blocks[1].getY() + SIZE / 2.0;
-//                break;
-//            case "z":
-//                baseX = blocks[2].getX() + SIZE / 2.0;
-//                baseY = blocks[2].getY();
-//                break;
-//            case "i":
-//                baseX = blocks[2].getX();
-//                baseY = blocks[2].getY() + SIZE / 2.0;
-//                break;
-//            case "o":
-//                // No need to rotate
-//                break;
-//        }
-//
-//        for (Rectangle block : blocks) {
-//            //creating the rotation transformation
-//            Rotate rotate = new Rotate();
-//            rotate.setAngle(angle);
-//            //Setting pivot points for the rotation
-//            rotate.setPivotX(baseX);
-//            rotate.setPivotY(baseY);
-//
-//            block.getTransforms().addAll(rotate);
-//            // block.getTransforms().add(Transform.rotate(angle, baseX, baseY));
-//            // addRotate(block, baseX, baseY, angle);
-//        }
-//    }
-
 
     // Getter
     public String getPieceName() {
