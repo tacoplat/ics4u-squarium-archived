@@ -22,6 +22,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 
+import static application.Common.*;
+
 public class GameController implements Initializable {
 
     // Initialize variables
@@ -45,14 +47,13 @@ public class GameController implements Initializable {
     private Button btnPlay;
 
     // private Scene scene = new Scene(group, XMAX + 150, YMAX); // Scene will have extra space on right for score, lines, etc
+    private boolean gameOver;
     private boolean isRunning;
-    private boolean cleanupLock;
+    private boolean clearRowLock;
     private boolean hardDrop;
     private GameBoard gameBoard;
     private Tetromino nextObj;
-    private Tetromino nextForDisplay;
     private Tetromino holdObj;
-    private Tetromino holdForDisplay;
 
     // Counter for score and number of lines cleared
     private int lineNum;
@@ -70,111 +71,113 @@ public class GameController implements Initializable {
     private boolean debug;
 
     public GameController() {
+        setDefault();
+    }
+
+    private void setDefault() {
         debug = true;
         score = 0;
         lineNum = 0;
+        gameOver = false;
         isRunning = false;
-        cleanupLock = false;
+        clearRowLock = false;
         hardDrop = false;
-        ses = Executors.newScheduledThreadPool(1);
 
         gameBoard = new GameBoard();
-        nextObj = new Tetromino();
-        nextForDisplay = null;
+        nextObj = nextObj = new Tetromino();
         holdObj = null;
-        holdForDisplay = null;
     }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 
+        ses = Executors.newScheduledThreadPool(1);
         try {
             // Init delay = 0, repeat the task every 1 millisecond
             scheduledFuture = ses.scheduleAtFixedRate(taskUpdating, 0, 1, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
             System.out.println("Exception:" + e.getMessage());
         }
-
-        // Create first Tetromino
-        generateNextTetromino();
     }
 
-    public void cleanupGrid() {
-        if (!cleanupLock) {
+    public void clearParkedRows() {
+        if (!clearRowLock) {
             // Todo: block the button click and keypress
-            cleanupLock = true;
-            boolean isRunningCache = false;
+            clearRowLock = true;
+            boolean isRunningCached = false;
             if (isRunning) {
-                isRunningCache = true;
+                isRunningCached = true;
                 isRunning = false;
             }
 
             int[][] grid = gameBoard.getGrid();
-            Rectangle[][] filledBlocks = gameBoard.getFilledBlocks();
-            int topRowIdx = GameBoard.HIGH;
-            for (int row = 0; row < GameBoard.HIGH; row++) {
+            var parkedBlocks = gameBoard.getParkedBlocks();
+            int topRowIdx = HIGH;
+            for (int row = 0; row < HIGH; row++) {
                 if (Arrays.stream(grid[row]).anyMatch(idx -> idx == 1)) {
-                    if (topRowIdx == GameBoard.HIGH) topRowIdx = row;
+                    if (topRowIdx == HIGH) topRowIdx = row;
                     if (Arrays.stream(grid[row]).allMatch(idx -> idx == 1)) {
                         // Delete the row and move the blocks on top one row down
-                        for (Rectangle block : filledBlocks[row]) {
-                            leftPane.getChildren().remove(block);
+                        for (int m = 0; m < WIDE; m++) {
+                            int key = row * WIDE + m;
+                            var block = gameBoard.findBlockByIndex(key);
+                            leftPane.getChildren().remove(block.getUiBox());
+                            parkedBlocks.remove(block);
                         }
                         lineNum++;
                         Arrays.fill(grid[row], 0);
-                        Arrays.fill(filledBlocks[row], null);
+
                         for (int k = row - 1; k >= topRowIdx; k--) {
-                            var tmpRow = filledBlocks[k];
-                            for (int m = 0; m < GameBoard.WIDE; m++) {
-                                if (tmpRow[m] != null) {
-                                    tmpRow[m].setY(tmpRow[m].getY() + Tetromino.SIZE);
+                            for (int m = 0; m < WIDE; m++) {
+                                if (grid[k][m] == 1) {
+                                    TetroBox block = gameBoard.findBlockByIndex(Common.calculateIndex(k, m));
+                                    block.move();
                                     grid[k][m] = 0;
                                     grid[k + 1][m] = 1;
-                                    filledBlocks[k + 1][m] = tmpRow[m];
-                                    filledBlocks[k][m] = null;
                                 }
                             }
                         }
                     }
                 }
             }
-            if (isRunningCache) {
+            if (isRunningCached) {
                 isRunning = true;
             }
+
+            clearRowLock = false;
         }
     }
 
-    public void generateNextTetromino() {
-        if (tetromino != null) {
-            // Add parked tetromino to the game board
-            gameBoard.addToGrid(tetromino);
-            cleanupGrid();
+    public void addNextTetromino() {
+        tetromino = new Tetromino(nextObj.getPieceName(), true);
+        // Display the new added Tetromino shape on the Game Board
+        for(TetroBox block: tetromino.getBlocks()){
+            leftPane.getChildren().add(block.getUiBox());
         }
 
-        tetromino = nextObj;
-        for (Rectangle block : tetromino.getBlocks()) {
-            leftPane.getChildren().add(block);
-        }
-
-        // Display the next Tetromino shape on the right Pane
-        nextObj = new Tetromino();
-
-        if (nextForDisplay != null) {
-            for (Rectangle block : nextForDisplay.getBlocks()) {
-                displayNextPane.getChildren().remove(block);
+        if(nextObj!=null){
+            // Remove the next Tetromino shape from the Right Pane
+            for(TetroBox block: nextObj.getBlocks()){
+                displayNextPane.getChildren().remove(block.getUiBox());
             }
         }
-        Rectangle[] nextBlocksForDisplay = new Rectangle[4];
-        int i = 0;
-        for (Rectangle block : nextObj.getBlocks()) {
-            double x = block.getX() - (GameBoard.XMAX / 2) + 65.0;
-            double y = block.getY();
 
-            nextBlocksForDisplay[i] = new Rectangle(x, y, Tetromino.SIZE, Tetromino.SIZE);
-            displayNextPane.getChildren().add(nextBlocksForDisplay[i]);
-            i++;
+        nextObj = new Tetromino();
+
+        // Display the next Tetromino shape on the Right Pane
+        for(TetroBox block: nextObj.getBlocks()){
+            displayNextPane.getChildren().add(block.getUiBox());
         }
-        nextForDisplay = new Tetromino(nextBlocksForDisplay, nextObj.getPieceName(), nextObj.getColor());
+
+    }
+
+    public void addPardedTetromino() {
+        if (tetromino != null) {
+            // Add parked tetromino to the Game Board
+            gameBoard.addToBoard(tetromino);
+            // Todo: double check and add back
+            clearParkedRows();
+        }
     }
 
     /**
@@ -189,10 +192,13 @@ public class GameController implements Initializable {
             if (debug) System.out.println("Moving --------------");
             Platform.runLater(() -> {
 
+                // Todo: Game over: reahed top or new generate can't move down
                 if (Arrays.stream(gameBoard.getGrid()[0]).anyMatch(idx -> idx == 1)) {
                     // Game over
                     if (debug) System.out.println("GAME OVER --------------");
                     isRunning = false;
+                    gameOver = true;
+                    btnPlay.setText("GAME OVER");
 
                     Text over = new Text("GAME OVER");
                     over.setFill(Color.RED);
@@ -200,15 +206,25 @@ public class GameController implements Initializable {
                     over.setY(250);
                     over.setX(10);
                     leftPane.getChildren().add(over);
-
                 }
 
-                int movable = tetromino.move(gameBoard.getGrid(), "down");
-                if (movable == 2 || movable == 3) {
+                // initial
+                // nextObj = new Tetromino();
+                // addNextTetromino();
+                // if(tetromino move down touched bottom or parked blocks) addPardedTetromino();
+
+                // Set<Integer> parkedBlocksKeys, String direction
+
+                if(tetromino == null) addNextTetromino();
+
+                boolean moved = tetromino.move(gameBoard.getIndexList(), "down");
+                if (!moved) {
                     // Touched the bottom or other blocks
                     hardDrop = false;
                     // Generate new Tetromino
-                    generateNextTetromino();
+                    addPardedTetromino();
+                    clearParkedRows();
+                    addNextTetromino();
                 }
             });
         }
@@ -228,85 +244,99 @@ public class GameController implements Initializable {
     // Handles arrow key press to move
     @FXML
     public void handleKeyPress(KeyEvent event) {
-        int movable;
+        boolean moved;
         if (debug) System.out.println("debug..." + event.getText());
         // https://openjfx.io/javadoc/16/javafx.graphics/javafx/scene/input/KeyCode.html
         switch (event.getCode()) {
             case RIGHT:     // Non-numpad right arrow key pressed
             case KP_RIGHT:  // Numeric keypad right arrow key pressed
                 if (isRunning) {
-                    tetromino.move(gameBoard.getGrid(), "right");
+                    tetromino.move(gameBoard.getIndexList(), "right");
                 }
                 break;
             case LEFT:      // Non-numpad left arrow key pressed
             case KP_LEFT:   // Numeric keypad left arrow key pressed
                 if (isRunning) {
-                    tetromino.move(gameBoard.getGrid(), "left");
+                    tetromino.move(gameBoard.getIndexList(), "left");
                 }
                 break;
 
             case DOWN:     // Non-numpad down arrow key pressed
             case KP_DOWN:  // Numeric keypad down arrow key pressed
                 if (isRunning) {
-                    movable = tetromino.move(gameBoard.getGrid(), "down");
-                    if (movable == 2 || movable == 3) {
+                    moved = tetromino.move(gameBoard.getIndexList(), "down");
+                    if (!moved) {
                         // Touched the bottom or other blocks
                         // Generate new Tetromino
-                        generateNextTetromino();
+                        addPardedTetromino();
+                        // Todo: double check and add back
+                        clearParkedRows();
+                        addNextTetromino();
                     }
                 }
                 break;
             case ENTER:    // Enter key pressed
-                isRunning = !isRunning;
-                if (isRunning) {
-                    btnPlay.setText("PAUSE");
-                } else {
+                if (gameOver) {
                     btnPlay.setText("PLAY");
+                    setDefault();
+                } else {
+                    isRunning = !isRunning;
+                    if (isRunning) {
+                        btnPlay.setText("PAUSE");
+                    } else {
+                        btnPlay.setText("PLAY");
+                    }
                 }
                 break;
             case UP:
             case KP_UP:
-                tetromino.changeOrientation(gameBoard.getGrid());
+                tetromino.rotate(gameBoard.getIndexList(), true);
+                break;
+            case F:
+                tetromino.rotate(gameBoard.getIndexList(), false);
                 break;
             case SPACE:
                 this.hardDrop = true;
                 break;
-            /*
+
             case C:
                 if (tetromino != null) {
-                    if(holdObj != null ){
+                    if (holdObj != null) {
                         Tetromino tmpObj = holdObj;
                         holdObj = tetromino;
                         tetromino = tmpObj;
-                    }else{
+                    } else {
                         holdObj = tetromino;
                         tetromino = nextObj;
                         nextObj = new Tetromino();
                     }
 
-                    if (holdForDisplay != null) {
-                        for (Rectangle block : holdForDisplay.getBlocks()) {
-                            displayHoldPane.getChildren().remove(block);
-                        }
-                    }
+
+//                    if (holdForDisplay != null) {
+//                        for (Rectangle block : holdForDisplay.getBlocks()) {
+//                            displayHoldPane.getChildren().remove(block);
+//                        }
+//                    }
+                    /*
                     Rectangle[] holdBlocksForDisplay = new Rectangle[4];
                     int i = 0;
                     for (Rectangle block : nextObj.getBlocks()) {
-                        double x = block.getX() - (GameBoard.XMAX / 2) + 65.0;
+                        double x = block.getX() - (XMAX / 2) + 65.0;
                         double y = block.getY();
 
-                        holdBlocksForDisplay[i] = new Rectangle(x, y, Tetromino.SIZE, Tetromino.SIZE);
+                        holdBlocksForDisplay[i] = new Rectangle(x, y, SIZE, SIZE);
                         displayHoldPane.getChildren().add(holdBlocksForDisplay[i]);
                         i++;
                     }
-                    holdForDisplay = new Tetromino(holdBlocksForDisplay, holdObj.getPieceName(), holdObj.getColor());
-
-                    for (Rectangle block : holdForDisplay.getBlocks()) {
-                        displayNextPane.getChildren().remove(block);
-                    }
+                    */
+//                    holdForDisplay = new Tetromino(holdBlocksForDisplay, holdObj.getPieceName(), holdObj.getColor());
+//
+//                    for (Rectangle block : holdForDisplay.getBlocks()) {
+//                        displayNextPane.getChildren().remove(block);
+//                    }
                 }
                 break;
-                */
+
         }
     }
 

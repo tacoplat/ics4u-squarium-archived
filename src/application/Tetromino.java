@@ -1,549 +1,267 @@
 package application;
 
-import javafx.collections.ObservableList;
-import javafx.geometry.Point3D;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.transform.NonInvertibleTransformException;
-import javafx.scene.transform.Rotate;
-import javafx.scene.transform.Transform;
+
+import java.sql.SQLOutput;
+import java.util.*;
+
+import static application.Common.HIGH;
+import static application.Common.WIDE;
 
 public class Tetromino {
 
-    // Size of square that tetromino is composed of
-    public static final int SIZE = 25;
-
-    // Initialize each block/square making up tetromino piece
-    private Rectangle[] blocks;
-
     // Name of tetromino piece based on their shape
     private String pieceName;
+    private Color colorFill;
 
-    private Color color;
+    // The size of the matrix contains the blocks
+    private int baseGridSize;
 
-    private int orientation;
+    // The blocks/Tiles making up tetromino piece
+    private List<TetroBox> blocks;
 
-    // Constructor
     public Tetromino() {
-        orientation = 1;
-        makeRect();
-        setColor();
+        this.pieceName = generateRandomPieceName();
+        initialize();
+        // Generate Blocks by default. Not centred for GameBoard
+        GenerateBlocks(false);
     }
 
-    public Tetromino(Rectangle[] blocks, String pieceName, Color color) {
-        orientation = 1;
-        this.blocks = blocks;
+    public Tetromino(String pieceName, boolean forGameBoard) {
         this.pieceName = pieceName;
-        this.color = color;
+        initialize();
+        GenerateBlocks(forGameBoard);
+    }
+
+    public void initialize() {
+        baseGridSize = 3;
+        blocks = new ArrayList<>();
         setColor();
     }
 
-    // Creating the squares/blocks that compose the tetromino
-    public void makeRect() {
-
+    private String generateRandomPieceName() {
+        String pieceName;
         // Pick random color between 0-100
         int randNum = (int) (Math.random() * 100);
 
-        blocks = new Rectangle[4];
-        for (int i = 0; i < blocks.length; i++) {
-            // Subtract 1 from size to create border/whitespace between each square so each individual square can be seen in tetromino
-            blocks[i] = new Rectangle(SIZE - 1, SIZE - 1);
-        }
-
-        int boardMidX = GameBoard.XMAX / 2;
-        // If randomly generated number is less than 15, generate "j" piece
         if (randNum < 15) {
             pieceName = "j";
-            blocks[0].setX(boardMidX - SIZE);
-            blocks[1].setX(boardMidX - SIZE);
-            blocks[1].setY(SIZE);
-            blocks[2].setX(boardMidX);
-            blocks[2].setY(SIZE);
-            blocks[3].setX(boardMidX + SIZE);
-            blocks[3].setY(SIZE);
-
         } else if (randNum < 30) {
             pieceName = "l";
-            blocks[0].setX(boardMidX + SIZE);
-            blocks[1].setX(boardMidX - SIZE);
-            blocks[1].setY(SIZE);
-            blocks[2].setX(boardMidX);
-            blocks[2].setY(SIZE);
-            blocks[3].setX(boardMidX + SIZE);
-            blocks[3].setY(SIZE);
-
         } else if (randNum < 45) {
             pieceName = "o";
-            blocks[0].setX(boardMidX - SIZE);
-            blocks[1].setX(boardMidX);
-            blocks[2].setX(boardMidX - SIZE);
-            blocks[2].setY(SIZE);
-            blocks[3].setX(boardMidX);
-            blocks[3].setY(SIZE);
-
         } else if (randNum < 60) {
             pieceName = "s";
-            blocks[0].setX(boardMidX + SIZE);
-            blocks[1].setX(boardMidX);
-            blocks[2].setX(boardMidX);
-            blocks[2].setY(SIZE);
-            blocks[3].setX(boardMidX - SIZE);
-            blocks[3].setY(SIZE);
-
         } else if (randNum < 75) {
             pieceName = "t";
-            blocks[0].setX(boardMidX - SIZE);
-            blocks[1].setX(boardMidX);
-            blocks[2].setX(boardMidX);
-            blocks[2].setY(SIZE);
-            blocks[3].setX(boardMidX + SIZE);
-
         } else if (randNum < 90) {
             pieceName = "z";
-            blocks[0].setX(boardMidX + SIZE);
-            blocks[1].setX(boardMidX);
-            blocks[2].setX(boardMidX + SIZE);
-            blocks[2].setY(SIZE);
-            blocks[3].setX(boardMidX + SIZE + SIZE);
-            blocks[3].setY(SIZE);
-
         } else {
             pieceName = "i";
-            blocks[0].setX(boardMidX - SIZE - SIZE);
-            blocks[1].setX(boardMidX - SIZE);
-            blocks[2].setX(boardMidX);
-            blocks[3].setX(boardMidX + SIZE);
-
         }
+
+        return pieceName;
     }
 
-    // Set color of each rectangle making up tetromino
-    public void setColor() {
-
+    /**
+     * @param forGameBoard true: For GameBoard; false: For Display on the RightPane
+     */
+    private void GenerateBlocks(boolean forGameBoard) {
+        int baseColumnNum = 0;
         switch (pieceName) {
+            case "o":
             case "j":
-                color = Color.BLUE;
+            case "s":
+            case "t":
+            case "z":
+                baseColumnNum = forGameBoard ? 5 : 0;
                 break;
             case "l":
-                color = Color.ORANGE;
+            case "i":
+                baseColumnNum = forGameBoard ? 4 : 0;
                 break;
+        }
+
+        GenerateBlocks(0, baseColumnNum);
+    }
+
+    private void GenerateBlocks(int baseRow, int baseColumn) {
+        switch (pieceName) {
             case "o":
-                color = Color.YELLOW;
+                // X X
+                // X X
+                baseGridSize = 2;
+                addTetroBox(baseRow, baseColumn,0, 0);
+                addTetroBox(baseRow, baseColumn,0, 1);
+                addTetroBox(baseRow, baseColumn,1, 0);
+                addTetroBox(baseRow, baseColumn,1, 1);
+                break;
+            case "j":
+                // X
+                // X X X
+                addTetroBox(baseRow, baseColumn, 0, 0);
+                addTetroBox(baseRow, baseColumn,1, 0);
+                addTetroBox(baseRow, baseColumn,1, 1);
+                addTetroBox(baseRow, baseColumn,1, 2);
+                break;
+            case "l":
+                //     X
+                // X X X
+                addTetroBox(baseRow, baseColumn,0, 2);
+                addTetroBox(baseRow, baseColumn,1, 0);
+                addTetroBox(baseRow, baseColumn,1, 1);
+                addTetroBox(baseRow, baseColumn,1, 2);
                 break;
             case "s":
-                color = Color.GREEN;
+                //   X X
+                // X X
+                addTetroBox(baseRow, baseColumn,0, 1);
+                addTetroBox(baseRow, baseColumn,0, 2);
+                addTetroBox(baseRow, baseColumn,1, 0);
+                addTetroBox(baseRow, baseColumn,1, 1);
                 break;
             case "t":
-                color = Color.PURPLE;
+                // X X X
+                //   X
+                addTetroBox(baseRow, baseColumn,0, 0);
+                addTetroBox(baseRow, baseColumn,0, 1);
+                addTetroBox(baseRow, baseColumn,0, 2);
+                addTetroBox(baseRow, baseColumn,1, 1);
                 break;
             case "z":
-                color = Color.RED;
+                // X X
+                //   X X
+                addTetroBox(baseRow, baseColumn,0, 0);
+                addTetroBox(baseRow, baseColumn,0, 1);
+                addTetroBox(baseRow, baseColumn,1, 1);
+                addTetroBox(baseRow, baseColumn,1, 2);
                 break;
             case "i":
-                color = Color.CYAN;
+                // X X X X
+                baseGridSize = 4;
+                    addTetroBox(baseRow, baseColumn,0, 0);
+                    addTetroBox(baseRow, baseColumn,0, 1);
+                    addTetroBox(baseRow, baseColumn,0, 2);
+                    addTetroBox(baseRow, baseColumn,0, 3);
                 break;
         }
+    }
 
-        // Set color for each block
-        for (int i = 0; i < blocks.length; i++) {
-            blocks[i].setFill(color);
-        }
+    private void addTetroBox(int baseRow, int baseColumn, int offsetRow, int offsetColumn) {
+        int row = baseRow + offsetRow;
+        int col = baseColumn + offsetColumn;
+        blocks.add(new TetroBox(row, col, offsetRow, offsetColumn, colorFill));
     }
 
     /**
-     * @param grid
-     * @param direction
-     * @return 0: Can't move; 1: Movable; 2: Touched the bottom; 3: Touched other blocks
+     * Set color for fill the rectangle making up tetromino
      */
-    public int isMovable(int[][] grid, String direction) {
-        int rowIndex = 0;
-        int colunmIndex = 0;
+    private void setColor() {
+        switch (pieceName) {
+            case "j":
+                colorFill = Color.BLUE;
+                break;
+            case "l":
+                colorFill = Color.ORANGE;
+                break;
+            case "o":
+                colorFill = Color.YELLOW;
+                break;
+            case "s":
+                colorFill = Color.GREEN;
+                break;
+            case "t":
+                colorFill = Color.PURPLE;
+                break;
+            case "z":
+                colorFill = Color.RED;
+                break;
+            case "i":
+                colorFill = Color.CYAN;
+                break;
+        }
+    }
 
-        // Check to see if spot to move in the grid is empty (0) or occupied (1)
-        for (Rectangle block : blocks) {
-            rowIndex = GameBoard.getRowIndex(block);
-            colunmIndex = GameBoard.getColunmIndex(block);
-
-            if (direction == "right") {
-                rowIndex += 1;
-                if (rowIndex >= GameBoard.WIDE) {
-                    return 0;
-                }
-
-            } else if (direction == "left") {
-                rowIndex -= 1;
-                if (rowIndex < 0) {
-                    return 0;
-                }
-            } else {
-                colunmIndex += 1;
-                if (colunmIndex >= GameBoard.HIGH) {
-                    // block touched the bottom
-                    return 2;
-                }
+    private List<Integer> getMovedIndexList(String direction) {
+        List<Integer> indexList = new ArrayList<>();
+        for (TetroBox block : blocks) {
+            switch (direction) {
+                case "right":
+                    indexList.add(block.getIndex() + 1);
+                    break;
+                case "left":
+                    indexList.add(block.getIndex() - 1);
+                    break;
+                default:
+                    // Move Down
+                    indexList.add(block.getIndex() + 12);
             }
+        }
+        return indexList;
+    }
 
-            // Check if other blocks exist at the move location
-            if (grid[colunmIndex][rowIndex] == 1) {
-                return 3;
+    /**
+     * @param direction
+     * @return true: free to move; false: blocked;
+     */
+    public boolean isMovable(List<Integer> parkedBlocksKeys, String direction) {
+        if (isMovingAgainstEdge(direction)) return false;
+
+        List<Integer> nextKeys = getMovedIndexList(direction);
+
+        for (Integer parkedKey : parkedBlocksKeys) {
+            if (nextKeys.contains(parkedKey)) return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param direction
+     * @return false: free to move; true: Touched the edge;
+     */
+    public boolean isMovingAgainstEdge(String direction) {
+        for (TetroBox tetroBox : blocks) {
+            switch (direction) {
+                case "right":
+                    if (tetroBox.getColumnNum() == WIDE - 1) return true;
+                    break;
+                case "left":
+                    if (tetroBox.getColumnNum() == 0) return true;
+                    break;
+                default:
+                    if (tetroBox.getRowNum() == HIGH - 1) return true;
             }
         }
 
-        return 1;
+        return false;
     }
 
-    // Moving the blocks
-
     /**
-     * @param grid
      * @param direction
-     * @return 0: Can't move; 1: Movable; 2: Touched the bottom; 3: Touched other blocks
+     * @return 1: Moved successfully; 2: Touched the right edge; 3: Touched the left edge; 4: Touched the bottom;
      */
-    public int move(int[][] grid, String direction) {
-        int movable = isMovable(grid, direction);
-        if (movable == 1) {
-            double moveLocation = 0;
-
-            for (int i = 0; i < blocks.length; i++) {
-                if (direction == "right") {
-                    moveLocation = blocks[i].getX() + SIZE;
-                    blocks[i].setX(moveLocation);
-                } else if (direction == "left") {
-                    moveLocation = blocks[i].getX() - SIZE;
-                    blocks[i].setX(moveLocation);
-                } else {
-                    moveLocation = blocks[i].getY() + SIZE;
-                    blocks[i].setY(moveLocation);
+    public boolean move(List<Integer> parkedBlocksKeys, String direction) {
+        boolean movable = isMovable(parkedBlocksKeys, direction);
+        if (movable) {
+            for (TetroBox block : blocks) {
+                switch (direction) {
+                    case "right":
+                        block.setColumnNum(block.getColumnNum() + 1);
+                        break;
+                    case "left":
+                        block.setColumnNum(block.getColumnNum() - 1);
+                        break;
+                    default:
+                        // Move down
+                        block.setRowNum(block.getRowNum() + 1);
                 }
+                block.updateBlock();
             }
         }
         return movable;
     }
 
-    private void MoveDown(Rectangle block) {
-        if (block.getY() + SIZE < GameBoard.YMAX)
-            block.setY(block.getY() + SIZE);
-    }
-
-    private void MoveLeft(Rectangle block) {
-        if (block.getX() - SIZE >= 0)
-            block.setX(block.getX() - SIZE);
-    }
-
-    private void MoveRight(Rectangle block) {
-        if (block.getX() + SIZE <= GameBoard.XMAX - SIZE)
-            block.setX(block.getX() + SIZE);
-    }
-
-    private void MoveUp(Rectangle block) {
-        if (block.getY() - SIZE > 0)
-            block.setY(block.getY() - SIZE);
-    }
-
-    private boolean cB(int[][] grid, Rectangle rect, int x, int y) {
-        boolean xb = false;
-        boolean yb = false;
-        if (x >= 0)
-            xb = rect.getX() + x * SIZE <= GameBoard.XMAX - SIZE;
-        if (x < 0)
-            xb = rect.getX() + x * SIZE >= 0;
-        if (y >= 0)
-            yb = rect.getY() - y * SIZE > 0;
-        if (y < 0)
-            yb = rect.getY() + y * SIZE < GameBoard.YMAX;
-        return xb && yb && grid[((int) rect.getY() / SIZE) - y][((int) rect.getX() / SIZE) + x] == 0;
-    }
-
-    private void updateOrientation() {
-        if (orientation != 4) {
-            orientation++;
-        } else {
-            orientation = 1;
-        }
-    }
-
-    public void changeOrientation(int[][] grid) {
-        switch (pieceName) {
-            case "j":
-                if (orientation == 1 && cB(grid, blocks[0], 1, -1) && cB(grid, blocks[2], -1, -1) && cB(grid, blocks[3], -2, -2)) {
-                    MoveRight(blocks[0]);
-                    MoveDown(blocks[0]);
-                    MoveDown(blocks[2]);
-                    MoveLeft(blocks[2]);
-                    MoveDown(blocks[3]);
-                    MoveDown(blocks[3]);
-                    MoveLeft(blocks[3]);
-                    MoveLeft(blocks[3]);
-                    updateOrientation();
-                    break;
-                }
-                if (orientation == 2 && cB(grid, blocks[0], -1, -1) && cB(grid, blocks[2], -1, 1) && cB(grid, blocks[3], -2, 2)) {
-                    MoveDown(blocks[0]);
-                    MoveLeft(blocks[0]);
-                    MoveLeft(blocks[2]);
-                    MoveUp(blocks[2]);
-                    MoveLeft(blocks[3]);
-                    MoveLeft(blocks[3]);
-                    MoveUp(blocks[3]);
-                    MoveUp(blocks[3]);
-                    updateOrientation();
-                    break;
-                }
-                if (orientation == 3 && cB(grid, blocks[0], -1, 1) && cB(grid, blocks[2], 1, 1) && cB(grid, blocks[3], 2, 2)) {
-                    MoveLeft(blocks[0]);
-                    MoveUp(blocks[0]);
-                    MoveUp(blocks[2]);
-                    MoveRight(blocks[2]);
-                    MoveUp(blocks[3]);
-                    MoveUp(blocks[3]);
-                    MoveRight(blocks[3]);
-                    MoveRight(blocks[3]);
-                    updateOrientation();
-                    break;
-                }
-                if (orientation == 4 && cB(grid, blocks[0], 1, 1) && cB(grid, blocks[2], 1, -1) && cB(grid, blocks[3], 2, -2)) {
-                    MoveUp(blocks[0]);
-                    MoveRight(blocks[0]);
-                    MoveRight(blocks[2]);
-                    MoveDown(blocks[2]);
-                    MoveRight(blocks[3]);
-                    MoveRight(blocks[3]);
-                    MoveDown(blocks[3]);
-                    MoveDown(blocks[3]);
-                    updateOrientation();
-                    break;
-                }
-                break;
-            case "l":
-                if (orientation == 1 && cB(grid, blocks[0], 1, -1) && cB(grid, blocks[2], 1, 1) && cB(grid, blocks[1], 2, 2)) {
-                    MoveRight(blocks[0]);
-                    MoveDown(blocks[0]);
-                    MoveUp(blocks[2]);
-                    MoveRight(blocks[2]);
-                    MoveUp(blocks[1]);
-                    MoveUp(blocks[1]);
-                    MoveRight(blocks[1]);
-                    MoveRight(blocks[1]);
-                    updateOrientation();
-                    break;
-                }
-                if (orientation == 2 && cB(grid, blocks[0], -1, -1) && cB(grid, blocks[1], 2, -2) && cB(grid, blocks[2], 1, -1)) {
-                    MoveDown(blocks[0]);
-                    MoveLeft(blocks[0]);
-                    MoveRight(blocks[1]);
-                    MoveRight(blocks[1]);
-                    MoveDown(blocks[1]);
-                    MoveDown(blocks[1]);
-                    MoveRight(blocks[2]);
-                    MoveDown(blocks[2]);
-                    updateOrientation();
-                    break;
-                }
-                if (orientation == 3 && cB(grid, blocks[0], -1, 1) && cB(grid, blocks[2], -1, -1) && cB(grid, blocks[1], -2, -2)) {
-                    MoveLeft(blocks[0]);
-                    MoveUp(blocks[0]);
-                    MoveDown(blocks[2]);
-                    MoveLeft(blocks[2]);
-                    MoveDown(blocks[1]);
-                    MoveDown(blocks[1]);
-                    MoveLeft(blocks[1]);
-                    MoveLeft(blocks[1]);
-                    updateOrientation();
-                    break;
-                }
-                if (orientation == 4 && cB(grid, blocks[0], 1, 1) && cB(grid, blocks[1], -2, 2) && cB(grid, blocks[2], -1, 1)) {
-                    MoveUp(blocks[0]);
-                    MoveRight(blocks[0]);
-                    MoveLeft(blocks[1]);
-                    MoveLeft(blocks[1]);
-                    MoveUp(blocks[1]);
-                    MoveUp(blocks[1]);
-                    MoveLeft(blocks[2]);
-                    MoveUp(blocks[2]);
-                    updateOrientation();
-                    break;
-                }
-                break;
-            case "o":
-                break;
-            case "s":
-                if (orientation == 1 && cB(grid, blocks[0], -1, -1) && cB(grid, blocks[2], -1, 1) && cB(grid, blocks[3], 0, 2)) {
-                    MoveDown(blocks[0]);
-                    MoveLeft(blocks[0]);
-                    MoveLeft(blocks[2]);
-                    MoveUp(blocks[2]);
-                    MoveUp(blocks[3]);
-                    MoveUp(blocks[3]);
-                    updateOrientation();
-                    break;
-                }
-                if (orientation == 2 && cB(grid, blocks[0], 1, 1) && cB(grid, blocks[2], 1, -1) && cB(grid, blocks[3], 0, -2)) {
-                    MoveUp(blocks[0]);
-                    MoveRight(blocks[0]);
-                    MoveRight(blocks[2]);
-                    MoveDown(blocks[2]);
-                    MoveDown(blocks[3]);
-                    MoveDown(blocks[3]);
-                    updateOrientation();
-                    break;
-                }
-                if (orientation == 3 && cB(grid, blocks[0], -1, -1) && cB(grid, blocks[2], -1, 1) && cB(grid, blocks[3], 0, 2)) {
-                    MoveDown(blocks[0]);
-                    MoveLeft(blocks[0]);
-                    MoveLeft(blocks[2]);
-                    MoveUp(blocks[2]);
-                    MoveUp(blocks[3]);
-                    MoveUp(blocks[3]);
-                    updateOrientation();
-                    break;
-                }
-                if (orientation == 4 && cB(grid, blocks[0], 1, 1) && cB(grid, blocks[2], 1, -1) && cB(grid, blocks[3], 0, -2)) {
-                    MoveUp(blocks[0]);
-                    MoveRight(blocks[0]);
-                    MoveRight(blocks[2]);
-                    MoveDown(blocks[2]);
-                    MoveDown(blocks[3]);
-                    MoveDown(blocks[3]);
-                    updateOrientation();
-                    break;
-                }
-                break;
-            case "t":
-                if (orientation == 1 && cB(grid, blocks[0], 1, 1) && cB(grid, blocks[3], -1, -1) && cB(grid, blocks[2], -1, 1)) {
-                    MoveUp(blocks[0]);
-                    MoveRight(blocks[0]);
-                    MoveDown(blocks[3]);
-                    MoveLeft(blocks[3]);
-                    MoveLeft(blocks[2]);
-                    MoveUp(blocks[2]);
-                    updateOrientation();
-                    break;
-                }
-                if (orientation == 2 && cB(grid, blocks[0], 1, -1) && cB(grid, blocks[3], -1, 1) && cB(grid, blocks[2], 1, 1)) {
-                    MoveRight(blocks[0]);
-                    MoveDown(blocks[0]);
-                    MoveLeft(blocks[3]);
-                    MoveUp(blocks[3]);
-                    MoveUp(blocks[2]);
-                    MoveRight(blocks[2]);
-                    updateOrientation();
-                    break;
-                }
-                if (orientation == 3 && cB(grid, blocks[0], -1, -1) && cB(grid, blocks[3], 1, 1) && cB(grid, blocks[2], 1, -1)) {
-                    MoveDown(blocks[0]);
-                    MoveLeft(blocks[0]);
-                    MoveUp(blocks[3]);
-                    MoveRight(blocks[3]);
-                    MoveRight(blocks[2]);
-                    MoveDown(blocks[2]);
-                    updateOrientation();
-                    break;
-                }
-                if (orientation == 4 && cB(grid, blocks[0], -1, 1) && cB(grid, blocks[3], 1, -1) && cB(grid, blocks[2], -1, -1)) {
-                    MoveLeft(blocks[0]);
-                    MoveUp(blocks[0]);
-                    MoveRight(blocks[3]);
-                    MoveDown(blocks[3]);
-                    MoveDown(blocks[2]);
-                    MoveLeft(blocks[2]);
-                    updateOrientation();
-                    break;
-                }
-                break;
-            case "z":
-                if (orientation == 1 && cB(grid, blocks[1], 1, 1) && cB(grid, blocks[2], -1, 1) && cB(grid, blocks[3], -2, 0)) {
-                    MoveUp(blocks[1]);
-                    MoveRight(blocks[1]);
-                    MoveLeft(blocks[2]);
-                    MoveUp(blocks[2]);
-                    MoveLeft(blocks[3]);
-                    MoveLeft(blocks[3]);
-                    updateOrientation();
-                    break;
-                }
-                if (orientation == 2 && cB(grid, blocks[1], -1, -1) && cB(grid, blocks[2], 1, -1) && cB(grid, blocks[3], 2, 0)) {
-                    MoveDown(blocks[1]);
-                    MoveLeft(blocks[1]);
-                    MoveRight(blocks[2]);
-                    MoveDown(blocks[2]);
-                    MoveRight(blocks[3]);
-                    MoveRight(blocks[3]);
-                    updateOrientation();
-                    break;
-                }
-                if (orientation == 3 && cB(grid, blocks[1], 1, 1) && cB(grid, blocks[2], -1, 1) && cB(grid, blocks[3], -2, 0)) {
-                    MoveUp(blocks[1]);
-                    MoveRight(blocks[1]);
-                    MoveLeft(blocks[2]);
-                    MoveUp(blocks[2]);
-                    MoveLeft(blocks[3]);
-                    MoveLeft(blocks[3]);
-                    updateOrientation();
-                    break;
-                }
-                if (orientation == 4 && cB(grid, blocks[1], -1, -1) && cB(grid, blocks[2], 1, -1) && cB(grid, blocks[3], 2, 0)) {
-                    MoveDown(blocks[1]);
-                    MoveLeft(blocks[1]);
-                    MoveRight(blocks[2]);
-                    MoveDown(blocks[2]);
-                    MoveRight(blocks[3]);
-                    MoveRight(blocks[3]);
-                    updateOrientation();
-                    break;
-                }
-                break;
-            case "i":
-                if (orientation == 1 && cB(grid, blocks[0], 2, 2) && cB(grid, blocks[1], 1, 1) && cB(grid, blocks[3], -1, -1)) {
-                    MoveUp(blocks[0]);
-                    MoveUp(blocks[0]);
-                    MoveRight(blocks[0]);
-                    MoveRight(blocks[0]);
-                    MoveUp(blocks[1]);
-                    MoveRight(blocks[1]);
-                    MoveDown(blocks[3]);
-                    MoveLeft(blocks[3]);
-                    updateOrientation();
-                    break;
-                }
-                if (orientation == 2 && cB(grid, blocks[0], -2, -2) && cB(grid, blocks[1], -1, -1) && cB(grid, blocks[3], 1, 1)) {
-                    MoveDown(blocks[0]);
-                    MoveDown(blocks[0]);
-                    MoveLeft(blocks[0]);
-                    MoveLeft(blocks[0]);
-                    MoveDown(blocks[1]);
-                    MoveLeft(blocks[1]);
-                    MoveUp(blocks[3]);
-                    MoveRight(blocks[3]);
-                    updateOrientation();
-                    break;
-                }
-                if (orientation == 3 && cB(grid, blocks[0], 2, 2) && cB(grid, blocks[1], 1, 1) && cB(grid, blocks[3], -1, -1)) {
-                    MoveUp(blocks[0]);
-                    MoveUp(blocks[0]);
-                    MoveRight(blocks[0]);
-                    MoveRight(blocks[0]);
-                    MoveUp(blocks[1]);
-                    MoveRight(blocks[1]);
-                    MoveDown(blocks[3]);
-                    MoveLeft(blocks[3]);
-                    updateOrientation();
-                    break;
-                }
-                if (orientation == 4 && cB(grid, blocks[0], -2, -2) && cB(grid, blocks[1], -1, -1) && cB(grid, blocks[3], 1, 1)) {
-                    MoveDown(blocks[0]);
-                    MoveDown(blocks[0]);
-                    MoveLeft(blocks[0]);
-                    MoveLeft(blocks[0]);
-                    MoveDown(blocks[1]);
-                    MoveLeft(blocks[1]);
-                    MoveUp(blocks[3]);
-                    MoveRight(blocks[3]);
-                    updateOrientation();
-                    break;
-                }
-                break;
-        }
-    }
 
     // Getter
     public String getPieceName() {
@@ -553,16 +271,94 @@ public class Tetromino {
     /**
      * @return
      */
-    public Color getColor() {
-        return color;
+    public Color getColorFill() {
+        return colorFill;
     }
 
     /**
      * Getter
      *
-     * @return Array of Rectangle block
+     * @return List of TetroBox
      */
-    public Rectangle[] getBlocks() {
+    public List<TetroBox> getBlocks() {
         return blocks;
+    }
+
+    private int[][] getBaseGrid() {
+        int[][] baseGrid = new int[baseGridSize][baseGridSize];
+        for (TetroBox block : blocks) {
+            int row = block.getOffsetRow();
+            int column = block.getOffsetColumn();
+            baseGrid[row][column] = block.getIndex();
+        }
+        return baseGrid;
+    }
+
+    public boolean rotate(List<Integer> parkedBlocksKeys, boolean clockwise) {
+        TetroBox firstBlock = blocks.get(0);
+        int baseRowNum = firstBlock.getBaseRow();
+        int baseColumnNum = firstBlock.getBaseColumn();
+        if (baseRowNum < 0) {
+            // Can't rotate if the shape i is at the top row.
+            return false;
+        }
+        if (baseRowNum + baseGridSize >= HIGH) {
+            // Can't rotate if the base grid cross the bottom edge.
+            return false;
+        }
+        if (baseColumnNum + baseGridSize >= WIDE) {
+            // Can't rotate if the base grid cross the right edge.
+            return false;
+        }
+        if (baseColumnNum < 0) {
+            // Can't rotate if the base grid cross the left edge.
+            return false;
+        }
+
+        int[][] baseGrid = getBaseGrid();
+
+        // rotate the baseGrid
+        Common.rotate(baseGrid, clockwise);
+
+        // Check if the new location conflict with the parked blocks
+        for (int i = 0; i < baseGridSize; i++) {
+            for (int j = 0; j < baseGridSize; j++) {
+                if (baseGrid[i][j] > 0) {
+                    if(parkedBlocksKeys.contains(Common.calculateIndex(baseRowNum + i, baseColumnNum + j))){
+                        return false;
+                    }
+                }
+            }
+        }
+
+        TetroBox block;
+        // Move the blocks to the rotated location
+        for (int i = 0; i < baseGridSize; i++) {
+            for (int j = 0; j < baseGridSize; j++) {
+                if (baseGrid[i][j] > 0) {
+                    block = findBlockByIndex(baseGrid[i][j]);
+                    block.setOffsetRow(i);
+                    block.setOffsetColumn(j);
+                    block.setPosition(baseRowNum + i, baseColumnNum + j);
+                }
+            }
+        }
+        return true;
+    }
+
+    private TetroBox findBlockByIndex(int index) {
+        for (TetroBox block : blocks) {
+            if (block.getIndex() == index) return block;
+        }
+        return null;
+    }
+
+
+    public List<Integer> getIndexList() {
+        List<Integer> indexList = new ArrayList<>();
+        for (TetroBox block : blocks) {
+            indexList.add(block.getIndex());
+        }
+        return indexList;
     }
 }

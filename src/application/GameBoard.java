@@ -1,55 +1,53 @@
 package application;
 
-import javafx.scene.paint.Color;
-import javafx.scene.shape.*;
-import javafx.util.Pair;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.util.Arrays;
+import static application.Common.HIGH;
+import static application.Common.WIDE;
 
 public class GameBoard {
 
-
-    public static final int WIDE = 12;
-    public static final int HIGH = 26;
-
-    // Max length and witdh size of game screen
-    public static final int XMAX = Tetromino.SIZE * 12;
-    public static final int YMAX = Tetromino.SIZE * 26;
-
-    // Divides game screen into grid with the size each box of grid equal to SIZE
-    private int[][] grid;
-    private Rectangle[][] filledBlocks;
-
-    public static int getRowIndex(Rectangle block){
-        return ((int)block.getX() / Tetromino.SIZE);
-    }
-
-    public static int getColunmIndex(Rectangle block){
-        return ((int)block.getY() / Tetromino.SIZE);
-    }
+    // User HashMap to store tetromino blocks parked on the game board
+    // The location of the blocks were flattened to one dimension by using index = rowNum * WIDE + columnNum
+    private List<TetroBox> parkedBlocks;
 
     public GameBoard() {
-        grid = new int[HIGH][WIDE];
-        filledBlocks = new Rectangle[HIGH][WIDE];
+        parkedBlocks = new ArrayList<>();
+    }
+
+    public void addToBoard(Tetromino parked) {
+        var blocks = parked.getBlocks();
+        parkedBlocks.addAll(blocks);
     }
 
     public int[][] getGrid() {
+        int[][] grid = new int[HIGH][WIDE];
+        for (TetroBox block : parkedBlocks) {
+            grid[block.getRowNum()][block.getColumnNum()] = 1;
+        }
         return grid;
     }
 
-    public Rectangle[][] getFilledBlocks() {
-        return filledBlocks;
+    public List<TetroBox> getParkedBlocks() {
+        return parkedBlocks;
     }
 
-    public void addToGrid(Tetromino parked){
-        Rectangle[] parkedBlocks = parked.getBlocks();
-        for (Rectangle block: parkedBlocks) {
-            int row = GameBoard.getRowIndex(block);
-            int column = GameBoard.getColunmIndex(block);
-            grid[column][row] = 1;
-            filledBlocks[column][row] = block;
+    public List<Integer> getIndexList() {
+        List<Integer> indexList = new ArrayList<>();
+        for (TetroBox block : parkedBlocks) {
+            indexList.add(block.getIndex());
         }
+        return indexList;
     }
+
+    public TetroBox findBlockByIndex(int index) {
+        for (TetroBox block : parkedBlocks) {
+            if (block.getIndex() == index) return block;
+        }
+        return null;
+    }
+
 }
 
 
