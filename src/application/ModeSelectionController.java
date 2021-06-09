@@ -12,7 +12,10 @@ import javafx.stage.Window;
 import java.io.IOException;
 import java.net.URL;
 
+
+
 public class ModeSelectionController {
+    public static String modeSelect = "";
 
     //Instance fields
     FXMLLoader loader = new FXMLLoader();
@@ -39,17 +42,21 @@ public class ModeSelectionController {
     @FXML
     private void openClassicEasy(ActionEvent event) {
         GameController.movePerSecond = 2;
-        GameController.keyPressPerSecond = 4;
+        GameController.keyPressPerSecond = 6;
         changeScreen("fxml-layouts/classic-easy.fxml/", event);
     }
 
     @FXML
     private void openClassicMedium(ActionEvent event) {
-        changeScreen("", event);
+        GameController.movePerSecond = 6;
+        GameController.keyPressPerSecond = 8;
+        changeScreen("fxml-layouts/classic-easy.fxml/", event);
     }
     @FXML
     private void openClassicHard(ActionEvent event) {
-        changeScreen("", event);
+        GameController.movePerSecond = 15;
+        GameController.keyPressPerSecond = 25;
+        changeScreen("fxml-layouts/classic-easy.fxml/", event);
     }
 
 }
