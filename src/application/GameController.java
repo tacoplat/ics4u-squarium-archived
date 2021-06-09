@@ -310,13 +310,22 @@ public class GameController implements Initializable {
             case RIGHT:     // Non-numpad right arrow key pressed
             case KP_RIGHT:  // Numeric keypad right arrow key pressed
                 if (isRunning) {
-                    tetromino.move(gameBoard.getIndexList(), "right");
+                    if (ModeSelectionController.modeSelect == "inverted") {
+                        tetromino.move(gameBoard.getIndexList(), "left");
+                    } else {
+                        tetromino.move(gameBoard.getIndexList(), "right");
+                    }
                 }
                 break;
             case LEFT:      // Non-numpad left arrow key pressed
             case KP_LEFT:   // Numeric keypad left arrow key pressed
                 if (isRunning) {
-                    tetromino.move(gameBoard.getIndexList(), "left");
+                    if (ModeSelectionController.modeSelect == "inverted") {
+                        tetromino.move(gameBoard.getIndexList(), "right");
+                    } else {
+                        tetromino.move(gameBoard.getIndexList(), "left");
+                    }
+
                 }
                 break;
             case DOWN:     // Non-numpad down arrow key pressed
@@ -337,12 +346,21 @@ public class GameController implements Initializable {
             case UP:
             case KP_UP:
                 if (isRunning) {
-                    tetromino.rotate(gameBoard.getIndexList(), true);
+                    if (ModeSelectionController.modeSelect == "inverted") {
+                        tetromino.rotate(gameBoard.getIndexList(), false);
+                    } else {
+                        tetromino.rotate(gameBoard.getIndexList(), true);
+                    }
+
                 }
                 break;
             case Z:
                 if (isRunning) {
-                    tetromino.rotate(gameBoard.getIndexList(), false);
+                    if (ModeSelectionController.modeSelect == "inverted") {
+                        tetromino.rotate(gameBoard.getIndexList(), true);
+                    } else {
+                        tetromino.rotate(gameBoard.getIndexList(), false);
+                    }
                 }
                 break;
             case SPACE:

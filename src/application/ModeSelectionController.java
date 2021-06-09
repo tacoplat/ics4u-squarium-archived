@@ -12,8 +12,6 @@ import javafx.stage.Window;
 import java.io.IOException;
 import java.net.URL;
 
-
-
 public class ModeSelectionController {
     public static String modeSelect = "";
 
@@ -22,6 +20,7 @@ public class ModeSelectionController {
     URL fxmlURL;
 
     public static void main(String[] args) {
+
 
     }
 
@@ -55,6 +54,22 @@ public class ModeSelectionController {
     @FXML
     private void openClassicHard(ActionEvent event) {
         GameController.movePerSecond = 15;
+        GameController.keyPressPerSecond = 25;
+        changeScreen("fxml-layouts/classic-easy.fxml/", event);
+    }
+
+    @FXML
+    private void openModeInverted(ActionEvent event) {
+        modeSelect = "inverted";
+        GameController.movePerSecond = 6;
+        GameController.keyPressPerSecond = 25;
+        changeScreen("fxml-layouts/classic-easy.fxml/", event);
+    }
+
+    @FXML
+    private void openModeLock(ActionEvent event) {
+        modeSelect = "lock";
+        GameController.movePerSecond = 6;
         GameController.keyPressPerSecond = 25;
         changeScreen("fxml-layouts/classic-easy.fxml/", event);
     }
