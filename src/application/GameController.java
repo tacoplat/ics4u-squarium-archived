@@ -46,20 +46,22 @@ public class GameController implements Initializable {
     @FXML
     private Button btnPlay;
 
-    // private Scene scene = new Scene(group, XMAX + 150, YMAX); // Scene will have extra space on right for score, lines, etc
+    public static int keyPressPerSecond = 2;
+    public static int movePerSecond = 1;
+
     private boolean gameOver;
     private boolean isRunning;
+    private int ignoreKeyPressCounter;
     private boolean clearRowLock;
     private boolean hardDrop;
     private GameBoard gameBoard;
+    private Tetromino tetromino;
     private Tetromino nextObj;
     private Tetromino holdObj;
 
     // Counter for score and number of lines cleared
     private int lineNum;
     private int score;
-
-    private Tetromino tetromino;
 
     // Timer counter
     private int counter;
@@ -80,11 +82,13 @@ public class GameController implements Initializable {
         lineNum = 0;
         gameOver = false;
         isRunning = false;
+        ignoreKeyPressCounter = 0;
         clearRowLock = false;
         hardDrop = false;
 
         gameBoard = new GameBoard();
-        nextObj = nextObj = new Tetromino();
+        tetromino = null;
+        nextObj = new Tetromino();
         holdObj = null;
     }
 
@@ -151,13 +155,13 @@ public class GameController implements Initializable {
     public void addNextTetromino() {
         tetromino = new Tetromino(nextObj.getPieceName(), true);
         // Display the new added Tetromino shape on the Game Board
-        for(TetroBox block: tetromino.getBlocks()){
+        for (TetroBox block : tetromino.getBlocks()) {
             leftPane.getChildren().add(block.getUiBox());
         }
 
-        if(nextObj!=null){
+        if (nextObj != null) {
             // Remove the next Tetromino shape from the Right Pane
-            for(TetroBox block: nextObj.getBlocks()){
+            for (TetroBox block : nextObj.getBlocks()) {
                 displayNextPane.getChildren().remove(block.getUiBox());
             }
         }
@@ -165,17 +169,68 @@ public class GameController implements Initializable {
         nextObj = new Tetromino();
 
         // Display the next Tetromino shape on the Right Pane
-        for(TetroBox block: nextObj.getBlocks()){
+        for (TetroBox block : nextObj.getBlocks()) {
             displayNextPane.getChildren().add(block.getUiBox());
         }
 
+    }
+
+    private void holdTetromino() {
+        String pieceNameTetromino = tetromino.getPieceName();
+        if (holdObj != null) {
+            // Remove the current Tetromino shape from the Game Board Pane
+            for (TetroBox block : tetromino.getBlocks()) {
+                leftPane.getChildren().remove(block.getUiBox());
+            }
+            tetromino.changeShape(holdObj.getPieceName());
+            // Display the new added Tetromino shape on the Game Board
+            for (TetroBox block : tetromino.getBlocks()) {
+                leftPane.getChildren().add(block.getUiBox());
+            }
+
+            // Remove the previous hold Tetromino shape from the Right Pane
+            for (TetroBox block : holdObj.getBlocks()) {
+                displayHoldPane.getChildren().remove(block.getUiBox());
+            }
+            // Create the Tetromino for hold based on the piece name
+            holdObj = new Tetromino(pieceNameTetromino, false);
+            // Display the updated hold Tetromino shape on the Game Board
+            for (TetroBox block : holdObj.getBlocks()) {
+                displayHoldPane.getChildren().add(block.getUiBox());
+            }
+        } else {
+            holdObj = new Tetromino(pieceNameTetromino, false);
+            // Display the updated hold Tetromino shape on the Game Board
+            for (TetroBox block : holdObj.getBlocks()) {
+                displayHoldPane.getChildren().add(block.getUiBox());
+            }
+
+            // Remove the current Tetromino shape from the Game Board Pane
+            for (TetroBox block : tetromino.getBlocks()) {
+                leftPane.getChildren().remove(block.getUiBox());
+            }
+            tetromino.changeShape(nextObj.getPieceName());
+            // Display the new added Tetromino shape on the Game Board
+            for (TetroBox block : tetromino.getBlocks()) {
+                leftPane.getChildren().add(block.getUiBox());
+            }
+
+            // Remove the next shape from the Game Board Pane
+            for (TetroBox block : nextObj.getBlocks()) {
+                displayNextPane.getChildren().remove(block.getUiBox());
+            }
+            nextObj = new Tetromino();
+            // Display the next Tetromino shape on the Game Board
+            for (TetroBox block : nextObj.getBlocks()) {
+                displayNextPane.getChildren().add(block.getUiBox());
+            }
+        }
     }
 
     public void addPardedTetromino() {
         if (tetromino != null) {
             // Add parked tetromino to the Game Board
             gameBoard.addToBoard(tetromino);
-            // Todo: double check and add back
             clearParkedRows();
         }
     }
@@ -185,11 +240,15 @@ public class GameController implements Initializable {
      */
     private Runnable taskUpdating = () -> {
         counter++;
-        if (counter > 1000000) counter = 0;
+        if (counter > 10000000) counter = 0;
+
+        if (ignoreKeyPressCounter > 0) {
+            ignoreKeyPressCounter--;
+        }
 
         // Run one step per second or two steps per second if current step is greater than speed up step
-        if (isRunning && (counter % 1000 == 1 || hardDrop)) {
-            if (debug) System.out.println("Moving --------------");
+        if (isRunning && (counter % (1000 / movePerSecond) == 1 || hardDrop)) {
+            if (debug) System.out.println("Running --------------");
             Platform.runLater(() -> {
 
                 // Todo: Game over: reahed top or new generate can't move down
@@ -208,14 +267,7 @@ public class GameController implements Initializable {
                     leftPane.getChildren().add(over);
                 }
 
-                // initial
-                // nextObj = new Tetromino();
-                // addNextTetromino();
-                // if(tetromino move down touched bottom or parked blocks) addPardedTetromino();
-
-                // Set<Integer> parkedBlocksKeys, String direction
-
-                if(tetromino == null) addNextTetromino();
+                if (tetromino == null) addNextTetromino();
 
                 boolean moved = tetromino.move(gameBoard.getIndexList(), "down");
                 if (!moved) {
@@ -244,8 +296,15 @@ public class GameController implements Initializable {
     // Handles arrow key press to move
     @FXML
     public void handleKeyPress(KeyEvent event) {
-        boolean moved;
-        if (debug) System.out.println("debug..." + event.getText());
+
+        if (debug) System.out.println("Keypress..." + event.getCode());
+
+        if (ignoreKeyPressCounter > 0) {
+            return;
+        }
+
+        ignoreKeyPressCounter = 1000 / keyPressPerSecond;
+
         // https://openjfx.io/javadoc/16/javafx.graphics/javafx/scene/input/KeyCode.html
         switch (event.getCode()) {
             case RIGHT:     // Non-numpad right arrow key pressed
@@ -260,11 +319,10 @@ public class GameController implements Initializable {
                     tetromino.move(gameBoard.getIndexList(), "left");
                 }
                 break;
-
             case DOWN:     // Non-numpad down arrow key pressed
             case KP_DOWN:  // Numeric keypad down arrow key pressed
                 if (isRunning) {
-                    moved = tetromino.move(gameBoard.getIndexList(), "down");
+                    boolean moved = tetromino.move(gameBoard.getIndexList(), "down");
                     if (!moved) {
                         // Touched the bottom or other blocks
                         // Generate new Tetromino
@@ -272,6 +330,30 @@ public class GameController implements Initializable {
                         // Todo: double check and add back
                         clearParkedRows();
                         addNextTetromino();
+                    }
+                }
+                break;
+            case X:
+            case UP:
+            case KP_UP:
+                if (isRunning) {
+                    tetromino.rotate(gameBoard.getIndexList(), true);
+                }
+                break;
+            case Z:
+                if (isRunning) {
+                    tetromino.rotate(gameBoard.getIndexList(), false);
+                }
+                break;
+            case SPACE:
+                if (isRunning) {
+                    this.hardDrop = true;
+                }
+                break;
+            case C:
+                if (isRunning) {
+                    if (tetromino != null) {
+                        holdTetromino();
                     }
                 }
                 break;
@@ -288,55 +370,6 @@ public class GameController implements Initializable {
                     }
                 }
                 break;
-            case UP:
-            case KP_UP:
-                tetromino.rotate(gameBoard.getIndexList(), true);
-                break;
-            case F:
-                tetromino.rotate(gameBoard.getIndexList(), false);
-                break;
-            case SPACE:
-                this.hardDrop = true;
-                break;
-
-            case C:
-                if (tetromino != null) {
-                    if (holdObj != null) {
-                        Tetromino tmpObj = holdObj;
-                        holdObj = tetromino;
-                        tetromino = tmpObj;
-                    } else {
-                        holdObj = tetromino;
-                        tetromino = nextObj;
-                        nextObj = new Tetromino();
-                    }
-
-
-//                    if (holdForDisplay != null) {
-//                        for (Rectangle block : holdForDisplay.getBlocks()) {
-//                            displayHoldPane.getChildren().remove(block);
-//                        }
-//                    }
-                    /*
-                    Rectangle[] holdBlocksForDisplay = new Rectangle[4];
-                    int i = 0;
-                    for (Rectangle block : nextObj.getBlocks()) {
-                        double x = block.getX() - (XMAX / 2) + 65.0;
-                        double y = block.getY();
-
-                        holdBlocksForDisplay[i] = new Rectangle(x, y, SIZE, SIZE);
-                        displayHoldPane.getChildren().add(holdBlocksForDisplay[i]);
-                        i++;
-                    }
-                    */
-//                    holdForDisplay = new Tetromino(holdBlocksForDisplay, holdObj.getPieceName(), holdObj.getColor());
-//
-//                    for (Rectangle block : holdForDisplay.getBlocks()) {
-//                        displayNextPane.getChildren().remove(block);
-//                    }
-                }
-                break;
-
         }
     }
 

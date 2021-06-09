@@ -85,6 +85,16 @@ public class Tetromino {
         GenerateBlocks(0, baseColumnNum);
     }
 
+    public void changeShape(String pieceName){
+        this.pieceName = pieceName;
+        setColor();
+        TetroBox firstBlock = blocks.get(0);
+        int baseRow = firstBlock.getBaseRow();
+        int baseColumn = firstBlock.getBaseColumn();
+        blocks = new ArrayList<>();
+        GenerateBlocks(baseRow, baseColumn);
+    }
+
     private void GenerateBlocks(int baseRow, int baseColumn) {
         switch (pieceName) {
             case "o":
@@ -289,6 +299,10 @@ public class Tetromino {
         for (TetroBox block : blocks) {
             int row = block.getOffsetRow();
             int column = block.getOffsetColumn();
+            // if shape is t or i, move baseRowNum one row up
+            if(pieceName == "t" || pieceName == "i" ){
+                row += 1;
+            }
             baseGrid[row][column] = block.getIndex();
         }
         return baseGrid;
@@ -298,6 +312,10 @@ public class Tetromino {
         TetroBox firstBlock = blocks.get(0);
         int baseRowNum = firstBlock.getBaseRow();
         int baseColumnNum = firstBlock.getBaseColumn();
+        // if shape is t or i, move baseRowNum one row up
+        if(pieceName == "t" || pieceName == "i" ){
+            baseRowNum -= 1;
+        }
         if (baseRowNum < 0) {
             // Can't rotate if the shape i is at the top row.
             return false;
@@ -337,7 +355,12 @@ public class Tetromino {
             for (int j = 0; j < baseGridSize; j++) {
                 if (baseGrid[i][j] > 0) {
                     block = findBlockByIndex(baseGrid[i][j]);
-                    block.setOffsetRow(i);
+                    // if shape is t or i, reset offset
+                    if(pieceName == "t" || pieceName == "i" ){
+                        block.setOffsetRow(i-1);
+                    }else {
+                        block.setOffsetRow(i);
+                    }
                     block.setOffsetColumn(j);
                     block.setPosition(baseRowNum + i, baseColumnNum + j);
                 }

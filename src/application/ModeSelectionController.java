@@ -38,7 +38,8 @@ public class ModeSelectionController {
 
     @FXML
     private void openClassicEasy(ActionEvent event) {
-
+        GameController.movePerSecond = 2;
+        GameController.keyPressPerSecond = 4;
         changeScreen("fxml-layouts/classic-easy.fxml/", event);
     }
 
