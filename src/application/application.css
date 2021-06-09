@@ -47,10 +47,11 @@
   -fx-border-color: #242230;
   -fx-background-color: #FCD9E0;
   -fx-border-radius: 0.25em;
+  -fx-background-radius: 0.25em;
   -fx-text-fill: #242230;
 }
 
-.arrow-btns:hover, .arrow-btns:active {
+.arrow-btns:hover, .arrow-btns:active, .ab-active {
   -fx-background-color: #F7A1B2;
 }
 
@@ -78,4 +79,12 @@
   -fx-background-color: #D3C8F9;
   -fx-focus-color: transparent;
   -fx-faint-focus-color: transparent;
+}
+
+.table-view .column-header {
+  -fx-background-color: #A690F3;
+}
+
+.button-icon {
+  pointer-events: false;
 }

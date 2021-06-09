@@ -1,20 +1,19 @@
 package application;
-	
-import java.net.URL;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.stage.Stage;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
+import java.net.URL;
 
 
 public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-			URL fxmlURL = this.getClass().getResource("fxml-layouts/main-screen.fxml");
+			URL fxmlURL = this.getClass().getResource("fxml-layouts/profile-select.fxml");
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(fxmlURL);
 			
