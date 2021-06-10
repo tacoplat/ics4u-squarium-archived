@@ -38,13 +38,13 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<VBox prefHeight="640.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.Controller">
+<VBox prefHeight="650.0" prefWidth="530.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.Controller">
   <children>
     <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
          <children>
             <VBox alignment="CENTER" layoutX="75.0" layoutY="320.0" prefHeight="230.0" prefWidth="250.0" spacing="30.0">
                <children>
-                  <Button mnemonicParsing="false" prefHeight="44.0" prefWidth="218.0" styleClass="main-button" text="Play" />
+                  <Button mnemonicParsing="false" onAction="#openModeSelection" prefHeight="44.0" prefWidth="218.0" styleClass="main-button" text="Start" />
                   <Button fx:id="instructionsBtn" mnemonicParsing="false" onAction="#openInstructions" prefHeight="44.0" prefWidth="218.0" styleClass="main-button" text="Instructions" />
                   <Button mnemonicParsing="false" onAction="#openScoreboard" prefHeight="44.0" prefWidth="218.0" styleClass="main-button" text="Scoreboard" />
                </children>
