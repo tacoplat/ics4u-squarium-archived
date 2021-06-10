@@ -14,7 +14,6 @@ public class ProfileController extends Controller {
 
     // Instance fields
     ObservableList<Profile> profileList = FXCollections.observableArrayList();
-    private static String defaultProfilePath = "src/application/appdata/";
     private final boolean debug = false;
 
     // FXML Id elements
@@ -41,7 +40,7 @@ public class ProfileController extends Controller {
         profileTable.setFixedCellSize(24);
 
         // Update list and sort by ascending ID.
-        obtainProfilesFromFile(defaultProfilePath + "/profile.save");
+        obtainProfilesFromFile(Controller.getDefaultPath() + "/profile.save");
         sortProfilesById(profileList);
 
         // Try to set the default selected profile to the current one.
@@ -101,7 +100,7 @@ public class ProfileController extends Controller {
      */
     public void updateProfileFile() {
         try {
-            FileWriter fw = new FileWriter(defaultProfilePath + "/profile.save");
+            FileWriter fw = new FileWriter(Controller.getDefaultPath() + "/profile.save");
 
             // Blank string to hold written content.
             StringBuilder entry = new StringBuilder();
@@ -329,12 +328,6 @@ public class ProfileController extends Controller {
         }
     }
 
-    /**
-     * Set the default profile path
-     * @param path - Path to the save file.
-     */
-    public static void setDefaultProfilePath(String path) {
-        defaultProfilePath = path;
-    }
+
 
 }
