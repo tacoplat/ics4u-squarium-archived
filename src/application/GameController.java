@@ -10,7 +10,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
 import java.net.URL;
@@ -24,6 +23,9 @@ import java.util.concurrent.ScheduledFuture;
 
 import static application.Common.*;
 
+/**
+ * Controller for the game board
+ */
 public class GameController implements Initializable {
 
     // Initialize variables
@@ -72,10 +74,16 @@ public class GameController implements Initializable {
 
     private boolean debug;
 
+    /**
+     * Constructor for game controller
+     */
     public GameController() {
         setDefault();
     }
 
+    /**
+     * Method that sets the default settings
+     */
     private void setDefault() {
         debug = true;
         score = 0;
@@ -92,6 +100,11 @@ public class GameController implements Initializable {
         holdObj = null;
     }
 
+    /**
+     * Method to initialize fx components
+     * @param url The location used to resolve relative paths for the root object, or null if the location is not known.
+     * @param rb The resources used to localize the root object, or null if the root object was not localized.
+     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 
@@ -227,7 +240,7 @@ public class GameController implements Initializable {
         }
     }
 
-    public void addPardedTetromino() {
+    public void addParkedTetromino() {
         if (tetromino != null) {
             // Add parked tetromino to the Game Board
             gameBoard.addToBoard(tetromino);
@@ -274,7 +287,7 @@ public class GameController implements Initializable {
                     // Touched the bottom or other blocks
                     hardDrop = false;
                     // Generate new Tetromino
-                    addPardedTetromino();
+                    addParkedTetromino();
                     clearParkedRows();
                     addNextTetromino();
                 }
@@ -335,7 +348,7 @@ public class GameController implements Initializable {
                     if (!moved) {
                         // Touched the bottom or other blocks
                         // Generate new Tetromino
-                        addPardedTetromino();
+                        addParkedTetromino();
                         // Todo: double check and add back
                         clearParkedRows();
                         addNextTetromino();

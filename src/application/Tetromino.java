@@ -74,11 +74,11 @@ public class Tetromino {
             case "s":
             case "t":
             case "z":
-                baseColumnNum = forGameBoard ? 5 : 0;
+                baseColumnNum = forGameBoard ? 5 : 2;
                 break;
             case "l":
             case "i":
-                baseColumnNum = forGameBoard ? 4 : 0;
+                baseColumnNum = forGameBoard ? 4 : 1;
                 break;
         }
 

@@ -1,7 +1,8 @@
 package application;
 
-import java.util.List;
-
+/**
+ * Class containing static variables and general functions.
+ */
 public class Common {
 
     // Size of square box that tetromino is composed of
@@ -19,10 +20,21 @@ public class Common {
     // Max  witdh size of game screen
     public static final int YMAX = SIZE * HIGH;
 
+    /**
+     * Calculates index of each block in the game board
+     * @param rowNum The row number
+     * @param columnNum The column number
+     * @return The calculated index number for the block
+     */
     public static int calculateIndex(int rowNum, int columnNum) {
         return rowNum * WIDE + columnNum;
     }
 
+    /**
+     * Rotates the tetromino
+     * @param matrix 2D array for rotation
+     * @param clockwise If true, rotates clockwise. If false, rotates counter-clockwise.
+     */
     public static void rotate(int[][] matrix, boolean clockwise) {
         if (clockwise) {
             transpose(matrix);
@@ -33,6 +45,10 @@ public class Common {
         }
     }
 
+    /**
+     * Method to transpose the matrix
+     * @param matrix 2D array that will be transformed
+     */
     public static void transpose(int[][] matrix) {
         int n = matrix.length;
         for (int i = 0; i < n; i++) {
@@ -44,18 +60,26 @@ public class Common {
         }
     }
 
+    /**
+     * Method to reverse the elements in each column
+     * @param matrix 2D array that will be transformed
+     */
     public static void reverseColumns(int[][] matrix) {
         int n = matrix.length;
-        int tmp;
+        int temp;
         for (int j = 0; j < n; j++) {
             for (int i = 0; i < n / 2; i++) {
-                int temp = matrix[i][j];
+                temp = matrix[i][j];
                 matrix[i][j] = matrix[n - 1 - i][j];
                 matrix[n - 1 - i][j] = temp;
             }
         }
     }
 
+    /**
+     * Method to reverse the elements in each row
+     * @param matrix 2D array that will be transformed
+     */
     public static void reverseRows(int[][] matrix) {
         int n = matrix.length;
         int tmp;
