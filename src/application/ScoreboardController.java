@@ -59,6 +59,7 @@ public class ScoreboardController extends Controller {
 
         dialog.setHeaderText(null);
         dialog.setGraphic(null);
+        configurePopupIcons(dialog);
 
         ((Button) dialog.getDialogPane().lookupButton(ButtonType.OK)).setText("Erase"); // Relabel the ok button.
 
@@ -176,6 +177,7 @@ public class ScoreboardController extends Controller {
 
         dialog.setHeaderText(null);
         dialog.setGraphic(null);
+        configurePopupIcons(dialog);
 
         ((Button) dialog.getDialogPane().lookupButton(ButtonType.OK)).setText("Yes"); // Relabel the ok button.
         ((Button) dialog.getDialogPane().lookupButton(ButtonType.CANCEL)).setText("No"); // Relabel the cancel button.
