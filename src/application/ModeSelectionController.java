@@ -12,13 +12,42 @@ import javafx.stage.Window;
 import java.io.IOException;
 import java.net.URL;
 
+
+/**
+ * Controller class for mode selection screen
+ */
 public class ModeSelectionController extends Controller {
+    // Variable to identify which of the "other modes" has been selected ot play
     public static String modeSelect = "";
 
     //Instance fields
     FXMLLoader loader = new FXMLLoader();
     URL fxmlURL;
 
+    /**
+     * Changes the current scene to another FXML layout.
+     *
+     * @param path - The path to the FXML layout.
+     * @param event - JavaFX ActionEvent
+     */
+    private void changeScreen(String path, ActionEvent event) {
+
+        fxmlURL = this.getClass().getResource(path);
+        Scene scene = ((Button) event.getTarget()).getScene();
+
+        try {
+            Parent root = loader.load(fxmlURL);
+            scene.setRoot(root);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Opens game with easy settings
+     * @param event JavaFX ActionEvent
+     */
     @FXML
     private void openClassicEasy(ActionEvent event) {
         modeSelect = "classic-Easy";
@@ -29,6 +58,10 @@ public class ModeSelectionController extends Controller {
         changeScreen("fxml-layouts/classic-easy.fxml/", event);
     }
 
+    /**
+     * Opens game with medium settings
+     * @param event JavaFX ActionEvent
+     */
     @FXML
     private void openClassicMedium(ActionEvent event) {
         modeSelect = "classic-Medium";
@@ -38,6 +71,11 @@ public class ModeSelectionController extends Controller {
         GameController.difficulty = 2;
         changeScreen("fxml-layouts/classic-easy.fxml/", event);
     }
+
+    /**
+     * Opens game with hard/difficult settings
+     * @param event JavaFX ActionEvent
+     */
     @FXML
     private void openClassicHard(ActionEvent event) {
         modeSelect = "classic-Hard";
@@ -48,6 +86,10 @@ public class ModeSelectionController extends Controller {
         changeScreen("fxml-layouts/classic-easy.fxml/", event);
     }
 
+    /**
+     * Opens game with inverted settings
+     * @param event JavaFX ActionEvent
+     */
     @FXML
     private void openModeInverted(ActionEvent event) {
         modeSelect = "inverted";
@@ -58,6 +100,10 @@ public class ModeSelectionController extends Controller {
         changeScreen("fxml-layouts/classic-easy.fxml/", event);
     }
 
+    /**
+     * Opens game with lock game mode settings
+     * @param event JavaFX ActionEvent
+     */
     @FXML
     private void openModeLock(ActionEvent event) {
         modeSelect = "lock";

@@ -6,6 +6,9 @@ import java.util.*;
 import static application.Common.HIGH;
 import static application.Common.WIDE;
 
+/**
+ * Class for the different tetrominos (that are composed of tetro boxes)
+ */
 public class Tetromino {
 
     // Name of tetromino piece based on their shape
@@ -18,6 +21,9 @@ public class Tetromino {
     // The blocks/Tiles making up tetromino piece
     private List<TetroBox> blocks;
 
+    /**
+     * Constructor for tetromino
+     */
     public Tetromino() {
         this.pieceName = generateRandomPieceName();
         initialize();
@@ -25,18 +31,30 @@ public class Tetromino {
         GenerateBlocks(false);
     }
 
+    /**
+     * Constructor for tetromino
+     * @param pieceName Name of the piece
+     * @param forGameBoard True if the peice is supposed to be put on the game board, false if not
+     */
     public Tetromino(String pieceName, boolean forGameBoard) {
         this.pieceName = pieceName;
         initialize();
         GenerateBlocks(forGameBoard);
     }
 
+    /**
+     * Default JavaFX initialize method
+     */
     public void initialize() {
         baseGridSize = 3;
         blocks = new ArrayList<>();
         setColor();
     }
 
+    /**
+     * Method that generates a random piece name
+     * @return Returns the piece name that's randomly generated
+     */
     public static String generateRandomPieceName() {
         String pieceName;
 
@@ -66,6 +84,7 @@ public class Tetromino {
     }
 
     /**
+     * Method to generate the blocks for the specific piece
      * @param forGameBoard true: For GameBoard; false: For Display on the RightPane
      */
     private void GenerateBlocks(boolean forGameBoard) {
@@ -87,6 +106,10 @@ public class Tetromino {
         GenerateBlocks(0, baseColumnNum);
     }
 
+    /**
+     * Method that changes the tetromino piece
+     * @param pieceName The name of the tetromino piece
+     */
     public void changeShape(String pieceName){
         this.pieceName = pieceName;
         setColor();
@@ -97,6 +120,11 @@ public class Tetromino {
         GenerateBlocks(baseRow, baseColumn);
     }
 
+    /**
+     * Method to generate the blocks in the correct shape depending on the piece
+     * @param baseRow The bottom row of blocks of the shape
+     * @param baseColumn The last column of blocks of the shape
+     */
     private void GenerateBlocks(int baseRow, int baseColumn) {
         switch (pieceName) {
             case "o":
@@ -159,6 +187,13 @@ public class Tetromino {
         }
     }
 
+    /**
+     * Method that adds individual square blocks/tetrobox
+     * @param baseRow The bottom row of blocks of the shape
+     * @param baseColumn The last column of blocks of the shape
+     * @param offsetRow The number of rows the box is offset on grid
+     * @param offsetColumn The number of rows the box is offset on grid
+     */
     private void addTetroBox(int baseRow, int baseColumn, int offsetRow, int offsetColumn) {
         int row = baseRow + offsetRow;
         int col = baseColumn + offsetColumn;
@@ -194,6 +229,11 @@ public class Tetromino {
         }
     }
 
+    /**
+     * Getter for list of the indices of where the blocks will be moved to
+     * @param direction The move direction of the block
+     * @return Returns index list of index of location of where block will be after it is moved
+     */
     private List<Integer> getMovedIndexList(String direction) {
         List<Integer> indexList = new ArrayList<>();
         for (TetroBox block : blocks) {
@@ -213,7 +253,8 @@ public class Tetromino {
     }
 
     /**
-     * @param direction
+     * Checks to see if tetromino is able to be moved
+     * @param direction The direction the tetromino is to be moved
      * @return 0:can't move; 1: free to move; 2: Game over: new generated block can't move down;
      */
     public int isMovable(List<Integer> parkedBlocksKeys, String direction) {
@@ -240,6 +281,7 @@ public class Tetromino {
     }
 
     /**
+     * Checks to see if tetromino is against the edge
      * @param direction
      * @return false: free to move; true: Touched the edge;
      */
@@ -261,7 +303,8 @@ public class Tetromino {
     }
 
     /**
-     * @param direction
+     * Method to move tetromino
+     * @param direction The direction tetromino moves
      * @return 0:can't move; 1: Moved successfully; 2: Game over: new generated block can't move down;
      */
     public int move(List<Integer> parkedBlocksKeys, String direction) {
@@ -286,20 +329,24 @@ public class Tetromino {
     }
 
 
-    // Getter
+    /**
+     * Getter for piece name of tetromino
+     * @return Returns piece name
+     */
     public String getPieceName() {
         return pieceName;
     }
 
     /**
-     * @return
+     * Getter for the color that the piece will be
+     * @return Returns the color shape will be filled
      */
     public Color getColorFill() {
         return colorFill;
     }
 
     /**
-     * Getter
+     * Getter for blocks
      *
      * @return List of TetroBox
      */
@@ -307,6 +354,10 @@ public class Tetromino {
         return blocks;
     }
 
+    /**
+     * Getter for base grid of the peice
+     * @return Returns the base grid of the piece
+     */
     private int[][] getBaseGrid() {
         int[][] baseGrid = new int[baseGridSize][baseGridSize];
         for (TetroBox block : blocks) {
@@ -321,6 +372,12 @@ public class Tetromino {
         return baseGrid;
     }
 
+    /**
+     * Method to rotate tetromino
+     * @param parkedBlocksKeys  key for the parked blocks
+     * @param clockwise Turning direction of block
+     * @return True if able to rotate, false if not able to rotate
+     */
     public boolean rotate(List<Integer> parkedBlocksKeys, boolean clockwise) {
         TetroBox firstBlock = blocks.get(0);
         int baseRowNum = firstBlock.getBaseRow();
@@ -382,6 +439,11 @@ public class Tetromino {
         return true;
     }
 
+    /**
+     * Method to find a block by index
+     * @param index The index number of the block
+     * @return Returns null if block not found, returns the block if index is found
+     */
     private TetroBox findBlockByIndex(int index) {
         for (TetroBox block : blocks) {
             if (block.getIndex() == index) return block;
@@ -389,18 +451,30 @@ public class Tetromino {
         return null;
     }
 
+    /**
+     * Getter for base row number of piece
+     * @return Returns the base row number
+     */
     public int getBaseRowNumber(){
         if(blocks.size()>0) return blocks.get(0).getBaseRow();
 
         return 0;
     }
 
+    /**
+     * Getter for base column number of piece
+     * @return Returns the base column number
+     */
     public int getBaseColumnNumber(){
         if(blocks.size()>0) return blocks.get(0).getBaseColumn();
 
         return 0;
     }
 
+    /**
+     * Getter for index list of blocks
+     * @return Returns the index list
+     */
     public List<Integer> getIndexList() {
         List<Integer> indexList = new ArrayList<>();
         for (TetroBox block : blocks) {

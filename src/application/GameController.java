@@ -164,7 +164,11 @@ public class GameController extends Controller implements Initializable {
         }
     }
 
+    /**
+     * Method that checks and clears full rows
+     */
     public void clearParkedRows() {
+
         if (!clearRowLock) {
             // Meke sure no more clearParkedRows actions before the current call was finished
             clearRowLock = true;
@@ -183,6 +187,7 @@ public class GameController extends Controller implements Initializable {
             var parkedBlocks = gameBoard.getParkedBlocks();
             int topRowIdx = HIGH;
             int count = 0;
+            // Checks each row to see if there is a block there and saves index if there is
             for (int row = 0; row < HIGH; row++) {
                 if (Arrays.stream(grid[row]).anyMatch(idx -> idx == 1)) {
                     if (topRowIdx == HIGH) topRowIdx = row;
@@ -244,6 +249,9 @@ public class GameController extends Controller implements Initializable {
         }
     }
 
+    /**
+     * Method to add tetromino to the game board and displays next shape on right pane
+     */
     public void addNextTetromino() {
         if(nextObj == null) generateNextObj();
 
@@ -281,6 +289,22 @@ public class GameController extends Controller implements Initializable {
             newKey = Common.calculateIndex(newRow, newColumn);
             nextKeys.add(newKey);
         }
+    }
+    /**
+     * Method for the hold function of game. Holds the current tetromino piece that's on the game board and puts onto right pane
+     */
+    private void holdTetromino() {
+        String pieceNameTetromino = tetromino.getPieceName();
+        if (holdObj != null) {
+            // Remove the current Tetromino shape from the Game Board Pane
+            for (TetroBox block : tetromino.getBlocks()) {
+                leftPane.getChildren().remove(block.getUiBox());
+            }
+            tetromino.changeShape(holdObj.getPieceName());
+            // Display the new added Tetromino shape on the Game Board
+            for (TetroBox block : tetromino.getBlocks()) {
+                leftPane.getChildren().add(block.getUiBox());
+            }
 
         for (Integer parkedKey : gameBoard.getIndexList()) {
             if (nextKeys.contains(parkedKey)) {
@@ -373,6 +397,9 @@ public class GameController extends Controller implements Initializable {
         }
     }
 
+    /**
+     * Method that adds parked tetrominos to game board
+     */
     public void addParkedTetromino() {
         if (tetromino != null) {
             // Add parked tetromino to the Game Board
@@ -538,13 +565,18 @@ public class GameController extends Controller implements Initializable {
         }
     }
 
-    // Handles mouse click
+    /**
+     *  Handles mouse click
+     */
     @FXML
     public void handleMouseClick(MouseEvent mouseEvent) {
         processAction();
     }
 
-    // Handles arrow key press to move
+    /**
+     * Handles arrow key press to move
+     * @param event Keypress action
+     */
     @FXML
     public void handleKeyPress(KeyEvent event) {
 
