@@ -299,18 +299,33 @@ public class ProfileController extends Controller {
 
         // Check if the selected profile is not "Create New Profile".
         if (idToDelete != 0) {
-            int index = 1;
+            Alert dialog = new Alert(Alert.AlertType.CONFIRMATION);
 
-            // Iterate through the list and find the element with the specified ID.
-            for (int i = 0; i < profileList.size(); i++) {
-                if (profileList.get(i).getId() == idToDelete) {
-                    index = i;
+            dialog.setTitle("Delete Profile");
+            dialog.setContentText("Are you sure you want to delete this profile?\nThis action cannot be reverted.");
+
+            dialog.setHeaderText(null);
+            dialog.setGraphic(null);
+            configurePopupIcons(dialog);
+
+            ((Button) dialog.getDialogPane().lookupButton(ButtonType.OK)).setText("Delete"); // Relabel the ok button.
+
+            Optional<ButtonType> result = dialog.showAndWait();
+
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                int index = 1;
+
+                // Iterate through the list and find the element with the specified ID.
+                for (int i = 0; i < profileList.size(); i++) {
+                    if (profileList.get(i).getId() == idToDelete) {
+                        index = i;
+                    }
                 }
-            }
 
-            // Remove from list and update file.
-            profileList.remove(index);
-            updateProfileFile();
+                // Remove from list and update file.
+                profileList.remove(index);
+                updateProfileFile();
+            }
         }
     }
 
