@@ -7,9 +7,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
@@ -25,7 +24,7 @@ public class Controller {
 	public static Profile currentProfile;
 	public String[][] appInformation = {
 			{"Author(s)", "NelsonHacks [C. Zhang, A. Zhen]"},
-			{"App Name", ""},
+			{"App Name", "Squarium"},
 			{"Version", "1.0"}
 	};
 
@@ -116,6 +115,7 @@ public class Controller {
 
 		dialog.setHeaderText(null);
 		dialog.setGraphic(null);
+		configurePopupIcons(dialog);
 
 		((Button) dialog.getDialogPane().lookupButton(ButtonType.OK)).setText("Quit"); // Relabel the ok button.
 
@@ -149,6 +149,7 @@ public class Controller {
 
 		dialog.setHeaderText(null);
 		dialog.setGraphic(null);
+		configurePopupIcons(dialog);
 
 		ButtonType changePath = new ButtonType("Change Save Path");
 		ButtonType changeProfile = new ButtonType("Change Profile");
@@ -206,5 +207,14 @@ public class Controller {
 	 */
 	public static Integer getCurrentProfileId() {
 		return currentProfile.getId();
+	}
+
+	/**
+	 * Changes the icon of all popup windows.
+	 * @param popup - The alert object.
+	 */
+	public <T extends Dialog> void configurePopupIcons(T popup) {
+		Stage stage = (Stage) popup.getDialogPane().getScene().getWindow();
+		stage.getIcons().add(new Image("file:src/application/appicons/squarium-small.png"));
 	}
 }

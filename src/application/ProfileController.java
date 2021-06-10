@@ -176,6 +176,7 @@ public class ProfileController extends Controller {
 
         dialog.setHeaderText(null);
         dialog.setGraphic(null);
+        configurePopupIcons(dialog);
 
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(this::newProfile);
@@ -196,6 +197,7 @@ public class ProfileController extends Controller {
 
         dialog.setHeaderText(null);
         dialog.setGraphic(null);
+        configurePopupIcons(dialog);
 
         Optional<String> result = dialog.showAndWait();
         if (result.isPresent()) {
@@ -229,6 +231,7 @@ public class ProfileController extends Controller {
 
         dialog.setHeaderText(null);
         dialog.setGraphic(null);
+        configurePopupIcons(dialog);
 
         ((Button) dialog.getDialogPane().lookupButton(ButtonType.OK)).setText("Yes"); // Relabel the ok button.
         ((Button) dialog.getDialogPane().lookupButton(ButtonType.CANCEL)).setText("No"); // Relabel the cancel button.
@@ -257,15 +260,32 @@ public class ProfileController extends Controller {
      */
     @FXML
     private void processSelection(ActionEvent event) {
-        Profile selection = profileTable.getSelectionModel().getSelectedItem();
+        try {
+            Profile selection = profileTable.getSelectionModel().getSelectedItem();
 
-        if (selection.getId() == 0) {
-            profileCreationDialog();
-        } else {
-            Controller.setProfile(selection);
-            changeScreen("fxml-layouts/main-screen.fxml/", event);
+            // If the user selects "Create New Profile", create a profile.
+            if (selection.getId() == 0) {
+                profileCreationDialog();
+            } else {
+                // Otherwise, select the profile and proceed.
+                Controller.setProfile(selection);
+                changeScreen("fxml-layouts/main-screen.fxml/", event);
+            }
+        } catch (NullPointerException e) {
+
+            // Configure and show a dialog to prompt the user to select a valid choice.
+            Alert dialog = new Alert(Alert.AlertType.INFORMATION);
+
+            dialog.setTitle("Selection Error");
+            dialog.setContentText("Please select an option.");
+
+            dialog.setGraphic(null);
+            dialog.setHeaderText(null);
+
+            configurePopupIcons(dialog);
+
+            dialog.show();
         }
-
     }
 
     /**
