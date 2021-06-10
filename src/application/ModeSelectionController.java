@@ -12,7 +12,7 @@ import javafx.stage.Window;
 import java.io.IOException;
 import java.net.URL;
 
-public class ModeSelectionController {
+public class ModeSelectionController extends Controller {
     public static String modeSelect = "";
 
     //Instance fields
@@ -22,20 +22,6 @@ public class ModeSelectionController {
     public static void main(String[] args) {
 
 
-    }
-
-    private void changeScreen(String path, ActionEvent event) {
-
-        fxmlURL = this.getClass().getResource(path);
-        Scene scene = ((Button) event.getTarget()).getScene();
-
-        try {
-            Parent root = loader.load(fxmlURL);
-            scene.setRoot(root);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     @FXML

@@ -6,18 +6,23 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <VBox prefHeight="650.0" prefWidth="530.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.ModeSelectionController">
    <children>
       <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
          <children>
-            <Button id="back-button" layoutX="19.0" layoutY="20.0" mnemonicParsing="false"  prefHeight="50.0" prefWidth="50.0" styleClass="mini-button-round" />
-            <Text layoutX="102.0" layoutY="53.0" strokeType="OUTSIDE" strokeWidth="0.0" text="CLASSIC MODES" textAlignment="CENTER" wrappingWidth="197.0">
+            <Button id="back-button" layoutX="22.0" layoutY="23.0" mnemonicParsing="false" onAction="#openHomeScreen" prefHeight="40.0" prefWidth="40.0" styleClass="mini-button-round">
+               <graphic>
+                  <FontIcon boundsType="VISUAL" iconColor="WHITE" iconLiteral="mdi-arrow-left-bold" iconSize="30" layoutX="26.0" layoutY="54.0" selectionStart="0" textAlignment="CENTER" />
+               </graphic>
+            </Button>
+            <Text layoutX="168.0" layoutY="52.0" strokeType="OUTSIDE" strokeWidth="0.0" text="CLASSIC MODES" textAlignment="CENTER" wrappingWidth="197.0">
                <font>
                   <Font size="23.0" />
                </font>
             </Text>
-            <VBox alignment="CENTER" layoutX="75.0" layoutY="73.0" prefHeight="226.0" prefWidth="250.0" spacing="25.0">
+            <VBox alignment="CENTER" layoutX="140.0" layoutY="71.0" prefHeight="226.0" prefWidth="250.0" spacing="25.0">
                <children>
                   <Button id="easy-button" mnemonicParsing="false" onAction="#openClassicEasy" prefHeight="44.0" prefWidth="218.0" styleClass="main-button" text="Easy" />
                   <Button id="medium-button" mnemonicParsing="false" onAction="#openClassicMedium" prefHeight="44.0" prefWidth="218.0" styleClass="main-button" text="Medium" />
@@ -27,21 +32,21 @@
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </padding>
             </VBox>
-            <Text layoutX="102.0" layoutY="330.0" strokeType="OUTSIDE" strokeWidth="0.0" text="OTHER MODES" textAlignment="CENTER" wrappingWidth="197.0">
+            <Text layoutX="168.0" layoutY="326.0" strokeType="OUTSIDE" strokeWidth="0.0" text="OTHER MODES" textAlignment="CENTER" wrappingWidth="197.0">
                <font>
                   <Font size="23.0" />
                </font>
             </Text>
-            <VBox alignment="CENTER" layoutX="75.0" layoutY="306.0" prefHeight="244.0" prefWidth="250.0" spacing="50.0">
+            <VBox alignment="CENTER" layoutX="141.0" layoutY="351.0" prefHeight="166.0" prefWidth="250.0" spacing="50.0">
                <children>
-                  <Button id="inverted-button" fx:id="instructionsBtn" onAction="#openModeInverted" mnemonicParsing="false" prefHeight="44.0" prefWidth="218.0" styleClass="main-button" text="Inverted" />
+                  <Button id="inverted-button" fx:id="instructionsBtn" mnemonicParsing="false" onAction="#openModeInverted" prefHeight="44.0" prefWidth="218.0" styleClass="main-button" text="Inverted" />
                   <Button id="lock-button" mnemonicParsing="false" onAction="#openModeLock" prefHeight="44.0" prefWidth="218.0" styleClass="main-button" text="Lock" />
                </children>
                <padding>
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </padding>
             </VBox>
-            <Button id="play-button" layoutX="134.0" layoutY="550.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="132.0" styleClass="main-button" text="PLAY" />
+            <Button id="play-button" layoutX="199.0" layoutY="549.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="132.0" styleClass="main-button" text="PLAY" />
          </children>
       </AnchorPane>
    </children>
