@@ -157,3 +157,4 @@ local.properties
 /out/
 out/*
 **/out/*
+*.save

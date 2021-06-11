@@ -233,7 +233,7 @@ public class Controller {
 			File newScoreFile = new File(path);
 			try {
 				newScoreFile.createNewFile(); // Attempt to create the new file.
-				writePathToConfigFile(path);
+				writePathToConfigFile("src/application/appdata/");
 			} catch (IOException ex) {
 				System.out.println("File already exists.");
 				e.printStackTrace();
