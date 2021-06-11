@@ -13,16 +13,40 @@
     <AnchorPane fx:id="rightPane" maxHeight="650.0" maxWidth="200.0" minHeight="650.0" minWidth="200.0" prefHeight="650.0" prefWidth="200.0">
          <children>
             <Button fx:id="btnPlay" layoutX="34.0" layoutY="549.0" mnemonicParsing="false" onKeyPressed="#handleKeyPress" onMouseClicked="#handleMouseClick" prefHeight="50.0" prefWidth="132.0" styleClass="main-button" text="PLAY" />
-            <Pane fx:id="displayNextPane" accessibleText="Next" layoutX="26.0" layoutY="356.0" opacity="0.76" prefHeight="120.0" prefWidth="150.0" />
-            <Pane fx:id="displayHoldPane" accessibleText="Hold" layoutX="26.0" layoutY="102.0" prefHeight="120.0" prefWidth="150.0" />
-            <Label layoutX="76.0" layoutY="314.0" text="Next">
+            <Pane fx:id="displayNextPane" accessibleText="Next" layoutX="25.0" layoutY="404.0" opacity="0.76" prefHeight="120.0" prefWidth="150.0" />
+            <Pane fx:id="displayHoldPane" accessibleText="Hold" layoutX="23.0" layoutY="229.0" prefHeight="120.0" prefWidth="150.0" />
+            <Label layoutX="76.0" layoutY="363.0" text="Next">
                <font>
                   <Font size="24.0" />
                </font>
             </Label>
-            <Label layoutX="76.0" layoutY="66.0" text="Hold">
+            <Label layoutX="74.0" layoutY="192.0" text="Hold">
                <font>
                   <Font size="24.0" />
+               </font>
+            </Label>
+             <Button fx:id="btnBack" layoutX="16.0" layoutY="21.0" mnemonicParsing="false" onMouseClicked="#handleBtnBackClick" prefHeight="35.0" prefWidth="161.0" styleClass="main-button" text="Mode Selection">
+               <font>
+                  <Font size="10.0" />
+               </font></Button>
+            <Label fx:id="displayScore" layoutX="69.0" layoutY="86.0" prefHeight="29.0" prefWidth="117.0">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <Label fx:id="displayLineCleared" layoutX="69.0" layoutY="135.0" prefHeight="29.0" prefWidth="117.0">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <Label layoutX="13.0" layoutY="89.0" text="Score:">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <Label layoutX="13.0" layoutY="138.0" text="Line:">
+               <font>
+                  <Font size="18.0" />
                </font>
             </Label>
          </children></AnchorPane>

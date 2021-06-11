@@ -19,15 +19,12 @@ public class ModeSelectionController extends Controller {
     FXMLLoader loader = new FXMLLoader();
     URL fxmlURL;
 
-    public static void main(String[] args) {
-
-
-    }
-
     @FXML
     private void openClassicEasy(ActionEvent event) {
         GameController.movePerSecond = 2;
         GameController.keyPressPerSecond = 6;
+        GameController.lockMode = 0;
+        GameController.difficulty = 1;
         changeScreen("fxml-layouts/classic-easy.fxml/", event);
     }
 
@@ -35,12 +32,16 @@ public class ModeSelectionController extends Controller {
     private void openClassicMedium(ActionEvent event) {
         GameController.movePerSecond = 6;
         GameController.keyPressPerSecond = 8;
+        GameController.lockMode = 0;
+        GameController.difficulty = 2;
         changeScreen("fxml-layouts/classic-easy.fxml/", event);
     }
     @FXML
     private void openClassicHard(ActionEvent event) {
         GameController.movePerSecond = 15;
         GameController.keyPressPerSecond = 25;
+        GameController.lockMode = 0;
+        GameController.difficulty = 3;
         changeScreen("fxml-layouts/classic-easy.fxml/", event);
     }
 
@@ -49,6 +50,8 @@ public class ModeSelectionController extends Controller {
         modeSelect = "inverted";
         GameController.movePerSecond = 6;
         GameController.keyPressPerSecond = 25;
+        GameController.lockMode = 0;
+        GameController.difficulty = 3;
         changeScreen("fxml-layouts/classic-easy.fxml/", event);
     }
 
@@ -57,6 +60,8 @@ public class ModeSelectionController extends Controller {
         modeSelect = "lock";
         GameController.movePerSecond = 6;
         GameController.keyPressPerSecond = 25;
+        GameController.lockMode = 1;
+        GameController.difficulty = 4;
         changeScreen("fxml-layouts/classic-easy.fxml/", event);
     }
 
