@@ -19,6 +19,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
@@ -35,7 +36,7 @@ import static application.Common.*;
 /**
  * Controller for the game board
  */
-public class GameController implements Initializable {
+public class GameController extends Controller implements Initializable {
 
     // Initialize variables
 
@@ -63,13 +64,12 @@ public class GameController implements Initializable {
     @FXML
     private Button btnPlay;
 
-    @FXML
-    private Button btnBack;
 
     public static int keyPressPerSecond = 2;
     public static int movePerSecond = 1;
     public static int lockMode = 0;
     public static int difficulty = 0;
+    public static int staticScore;
 
     private int lockModeCounter;
     private int lockedMaxNumber;
@@ -86,7 +86,7 @@ public class GameController implements Initializable {
 
     // Counter for score and number of lines cleared
     private int lineNum;
-    private int score;
+    private int score = 0;
 
     // Timer counter
     private int counter;
@@ -173,11 +173,13 @@ public class GameController implements Initializable {
             int[][] grid = gameBoard.getGrid();
             var parkedBlocks = gameBoard.getParkedBlocks();
             int topRowIdx = HIGH;
+            int count = 0;
             for (int row = 0; row < HIGH; row++) {
                 if (Arrays.stream(grid[row]).anyMatch(idx -> idx == 1)) {
                     if (topRowIdx == HIGH) topRowIdx = row;
                     if (Arrays.stream(grid[row]).allMatch(idx -> idx == 1)) {
                         // Delete the row and move the blocks on top one row down
+                        count++;
                         for (int m = 0; m < WIDE; m++) {
                             int key = row * WIDE + m;
                             var block = gameBoard.findBlockByIndex(key);
@@ -193,7 +195,6 @@ public class GameController implements Initializable {
 
                         displayLineCleared.setText(String.valueOf(lineNum));
                         Arrays.fill(grid[row], 0);
-
                         for (int k = row - 1; k >= topRowIdx; k--) {
                             for (int m = 0; m < WIDE; m++) {
                                 if (grid[k][m] == 1) {
@@ -207,6 +208,7 @@ public class GameController implements Initializable {
                     }
                 }
             }
+          
             // Reference: https://www.codewars.com/kata/5da9af1142d7910001815d32
             // Increase scores based on the lines removed and the game diff
             switch (lineRemoved){
@@ -351,14 +353,18 @@ public class GameController implements Initializable {
         isRunning = false;
         gameOver = true;
         btnPlay.setText("RESTART");
-        btnBack.setText("Check Results");
-
-        Text over = new Text("GAME OVER");
-        over.setFill(Color.RED);
-        over.setStyle("-fx-font: 42 arial;");
-        over.setY(250);
-        over.setX(36);
-        leftPane.getChildren().add(over);
+      
+        String mode = ModeSelectionController.modeSelect;
+        ScoreboardController.writeScoreToFile(Controller.currentProfile.getPlayerName(), mode.substring(0, 1).toUpperCase() + mode.substring(1), score);
+        staticScore = score;
+        btnPlay.setOnAction(this::openGameOver);
+        try {
+            Thread.sleep(400);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        btnPlay.fire();
+        btnPlay.setOnAction(null);
     }
 
     /**
@@ -422,7 +428,6 @@ public class GameController implements Initializable {
     private void processAction(){
         if (gameOver) {
             btnPlay.setText("PLAY");
-            btnBack.setText("Mode Selection");
             resetGame();
         } else {
             isRunning = !isRunning;
@@ -433,15 +438,6 @@ public class GameController implements Initializable {
             } else {
                 btnPlay.setText("PLAY");
             }
-        }
-    }
-
-    @FXML
-    public void handleBtnBackClick(MouseEvent mouseEvent) {
-        if(gameOver){
-            changeScreen("fxml-layouts/game-over.fxml/", mouseEvent);
-        } else {
-            changeScreen("fxml-layouts/mode-selection.fxml/", mouseEvent);
         }
     }
 
@@ -528,6 +524,9 @@ public class GameController implements Initializable {
         }
     }
 
+    public static int getStaticScore() {
+        return staticScore;
+    }
     /**
      * Changes the current scene to another FXML layout.
      *
@@ -558,7 +557,6 @@ public class GameController implements Initializable {
             System.out.println("Could not load the specified layout.");
             e.printStackTrace();
         }
-
     }
 
 }

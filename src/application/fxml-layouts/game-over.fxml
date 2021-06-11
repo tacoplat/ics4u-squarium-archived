@@ -39,14 +39,14 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<VBox prefHeight="640.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.Controller">
+<VBox prefHeight="640.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.GameOverController">
   <children>
     <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
          <children>
             <VBox alignment="CENTER" layoutX="74.0" layoutY="320.0" prefHeight="230.0" prefWidth="250.0" spacing="30.0">
                <children>
-                  <Button mnemonicParsing="false" prefHeight="44.0" prefWidth="218.0" styleClass="main-button" text="Play Again" />
-                  <Button fx:id="instructionsBtn" mnemonicParsing="false" prefHeight="44.0" prefWidth="218.0" styleClass="main-button" text="Scoreboard" />
+                  <Button mnemonicParsing="false" onAction="#openModeSelection" prefHeight="44.0" prefWidth="218.0" styleClass="main-button" text="Play Again" />
+                  <Button fx:id="instructionsBtn" mnemonicParsing="false" onAction="#openScoreboard" prefHeight="44.0" prefWidth="218.0" styleClass="main-button" text="Scoreboard" />
                   <Button mnemonicParsing="false" onAction="#openHomeScreen" prefHeight="44.0" prefWidth="218.0" styleClass="main-button" text="Back to Title Screen" />
                </children>
                <padding>
@@ -58,6 +58,10 @@
                   <Font name="Source Sans Pro Bold" size="48.0" />
                </font>
             </Text>
+            <Text fx:id="gameOverScore" layoutX="146.0" layoutY="268.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Score: " textAlignment="CENTER" wrappingWidth="108.08514404296875">
+               <font>
+                  <Font size="14.0" />
+               </font></Text>
          </children>
     </AnchorPane>
   </children>

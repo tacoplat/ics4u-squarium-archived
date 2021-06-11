@@ -9,11 +9,11 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.util.Optional;
 
@@ -22,11 +22,19 @@ public class Controller {
 	// Instance fields
 	URL fxmlURL;
 	public static Profile currentProfile;
+	public static String defaultDataPath = "src/application/appdata/";
 	public String[][] appInformation = {
 			{"Author(s)", "NelsonHacks [C. Zhang, A. Zhen]"},
 			{"App Name", "Squarium"},
 			{"Version", "1.0"}
 	};
+
+	/**
+	 * Default JavaFX initialize method.
+	 */
+	public void initialize() {
+		updateDefaultPath();
+	}
 
 	/**
 	 * Changes the current scene to another FXML layout.
@@ -144,7 +152,8 @@ public class Controller {
 				appInformation[0][0] + ": " + appInformation[0][1] + "\n" +
 				appInformation[1][0] + ": " + appInformation[1][1] + "\n" +
 				appInformation[2][0] + ": " + appInformation[2][1] + "\n" +
-				"Current Profile: " + currentProfile.getPlayerName() + " (ID: " + currentProfile.getId() + ")"
+				"Current Profile: " + currentProfile.getPlayerName() + " (ID: " + currentProfile.getId() + ")\n" +
+				"Default Path: " + defaultDataPath
 		);
 
 		dialog.setHeaderText(null);
@@ -181,16 +190,77 @@ public class Controller {
 		// Configure a DirectoryChooser.
 		DirectoryChooser dc = new DirectoryChooser();
 		dc.setTitle("Set Default Game Save Path");
-		dc.setInitialDirectory(new File(ScoreboardController.getDefaultScoreboardPath()));
+		dc.setInitialDirectory(new File(Controller.getDefaultPath()));
 
 		try {
 			// Try to set the directory.
 			File directory = dc.showDialog(currentStage);
-			ScoreboardController.setDefaultScoreboardPath(directory.getAbsolutePath());
-			System.out.println("Game save directory set to " + directory.getAbsolutePath());
+			String newPath = directory.getAbsolutePath();
+			writePathToConfigFile(newPath);
+			updateDefaultPath();
+			System.out.println("Game save directory set to " + newPath);
 		} catch (NullPointerException e) {
-			System.out.println("User did not choose a file.");
+			System.out.println("User did not choose a directory.");
 		}
+	}
+
+	/**
+	 * Update the default path from the config file.
+	 */
+	private void updateDefaultPath() {
+		String path = "src/application/appdata/config.save";
+		try {
+			FileReader fr = new FileReader(path);
+			BufferedReader br = new BufferedReader(fr);
+
+			String str;
+
+			// Read through the lines of the config file.
+			while ((str = br.readLine()) != null) {
+
+				// Split the line by the delimiter, store in a String array.
+				String[] extract = str.split(">%");
+
+				if (extract[0].equals("path")) {
+					setDefaultPath(extract[1]);
+				}
+			}
+
+			fr.close();
+
+		} catch (FileNotFoundException e) {
+			System.out.println("Cannot locate config file.");
+			File newScoreFile = new File(path);
+			try {
+				newScoreFile.createNewFile(); // Attempt to create the new file.
+				writePathToConfigFile("src/application/appdata/");
+			} catch (IOException ex) {
+				System.out.println("File already exists.");
+				e.printStackTrace();
+			}
+		} catch (IOException e) {
+			System.out.println("Could not read from the file.");
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Write a new path to the config file.
+	 * @param path
+	 */
+	private void writePathToConfigFile(String path) {
+		try {
+			FileWriter fw = new FileWriter("src/application/appdata/config.save");
+			String entry = "\n" + "path" + ">%" + path;
+
+			fw.write(entry);
+			fw.close();
+
+		} catch (IOException e) {
+			System.out.println("Error reading from this file");
+			e.printStackTrace();
+		}
+
 	}
 
 	/**
@@ -216,5 +286,21 @@ public class Controller {
 	public <T extends Dialog> void configurePopupIcons(T popup) {
 		Stage stage = (Stage) popup.getDialogPane().getScene().getWindow();
 		stage.getIcons().add(new Image("file:src/application/appicons/squarium-small.png"));
+	}
+
+	/**
+	 * Set the default data path
+	 * @param path - Path to the save file.
+	 */
+	public static void setDefaultPath(String path) {
+		defaultDataPath = path;
+	}
+
+	/**
+	 * Returns the default data directory.
+	 * @return The default data path.
+	 */
+	public static String getDefaultPath() {
+		return defaultDataPath;
 	}
 }

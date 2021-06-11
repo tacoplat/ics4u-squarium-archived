@@ -14,7 +14,6 @@ public class ScoreboardController extends Controller {
     // Instance fields
     private ObservableList<Scoreboard> scores =
             FXCollections.observableArrayList();
-    private static String defaultScoreboardPath = "src/application/appdata/";
     private final boolean debug = false;
 
     // FXML Id references
@@ -42,7 +41,7 @@ public class ScoreboardController extends Controller {
         scoreboardTable.setFixedCellSize(24);
 
         // Update the scoreboard from the save file & sort entries descending by score.
-        obtainScoresFromFile(defaultScoreboardPath + "/score.save");
+        obtainScoresFromFile(Controller.getDefaultPath() + "/score.save");
         sortScoreboard(scores);
     }
 
@@ -67,29 +66,12 @@ public class ScoreboardController extends Controller {
 
         // Button actions.
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            eraseScores(defaultScoreboardPath + "/score.save"); // Erase the scoreboard.
+            eraseScores(Controller.getDefaultPath() + "/score.save"); // Erase the scoreboard.
             System.out.println("Scoreboard erased.");
         } else {
             dialog.close();
             System.out.println("User cancelled action.");
         }
-    }
-
-    /**
-     * Sets the default score file path.
-     * @param pathIn - The specified file path.
-     */
-    public static void setDefaultScoreboardPath(String pathIn) {
-        defaultScoreboardPath = pathIn;
-        ProfileController.setDefaultProfilePath(pathIn);
-    }
-
-    /**
-     * Gets the default score file path.
-     * @return The path to the save file.
-     */
-    public static String getDefaultScoreboardPath() {
-        return defaultScoreboardPath;
     }
 
     /**
@@ -118,7 +100,7 @@ public class ScoreboardController extends Controller {
     public static void writeScoreToFile(String playerNameIn, String modeIn, Integer scoreIn) {
         try {
             // Append the information (separated by delimiters) to the file.
-            FileWriter fw = new FileWriter(defaultScoreboardPath + "/score.save", true);
+            FileWriter fw = new FileWriter(Controller.getDefaultPath() + "/score.save", true);
             String entry = "\n" + playerNameIn + ">%" + modeIn + ">%" + scoreIn;
 
             fw.write(entry);
@@ -148,9 +130,12 @@ public class ScoreboardController extends Controller {
                 // Split the line by the delimiter, store in a String array.
                 String[] extract = str.split(">%");
 
-                // Add the data to the TableView list to display.
-                Scoreboard temp = new Scoreboard(extract[0], extract[1], Integer.valueOf(extract[2]));
-                scores.add(temp);
+                if (extract.length == 3) {
+                    // Add the data to the TableView list to display.
+                    Scoreboard temp = new Scoreboard(extract[0], extract[1], Integer.valueOf(extract[2]));
+                    scores.add(temp);
+                }
+
             }
 
             fr.close();

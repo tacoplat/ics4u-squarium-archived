@@ -21,6 +21,7 @@ public class ModeSelectionController extends Controller {
 
     @FXML
     private void openClassicEasy(ActionEvent event) {
+        modeSelect = "classic-Easy";
         GameController.movePerSecond = 2;
         GameController.keyPressPerSecond = 6;
         GameController.lockMode = 0;
@@ -30,6 +31,7 @@ public class ModeSelectionController extends Controller {
 
     @FXML
     private void openClassicMedium(ActionEvent event) {
+        modeSelect = "classic-Medium";
         GameController.movePerSecond = 6;
         GameController.keyPressPerSecond = 8;
         GameController.lockMode = 0;
@@ -38,6 +40,7 @@ public class ModeSelectionController extends Controller {
     }
     @FXML
     private void openClassicHard(ActionEvent event) {
+        modeSelect = "classic-Hard";
         GameController.movePerSecond = 15;
         GameController.keyPressPerSecond = 25;
         GameController.lockMode = 0;
