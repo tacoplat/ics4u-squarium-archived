@@ -359,7 +359,7 @@ public class GameController extends Controller implements Initializable {
         staticScore = score;
         btnPlay.setOnAction(this::openGameOver);
         try {
-            Thread.sleep(400);
+            Thread.sleep(1250);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
