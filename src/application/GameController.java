@@ -64,8 +64,6 @@ public class GameController extends Controller implements Initializable {
     @FXML
     private Button btnPlay;
 
-    @FXML
-    private Button btnBack;
 
     public static int keyPressPerSecond = 2;
     public static int movePerSecond = 1;
@@ -366,6 +364,7 @@ public class GameController extends Controller implements Initializable {
             e.printStackTrace();
         }
         btnPlay.fire();
+        btnPlay.setOnAction(null);
     }
 
     /**
@@ -429,7 +428,6 @@ public class GameController extends Controller implements Initializable {
     private void processAction(){
         if (gameOver) {
             btnPlay.setText("PLAY");
-            btnBack.setText("Mode Selection");
             resetGame();
         } else {
             isRunning = !isRunning;
@@ -440,15 +438,6 @@ public class GameController extends Controller implements Initializable {
             } else {
                 btnPlay.setText("PLAY");
             }
-        }
-    }
-
-    @FXML
-    public void handleBtnBackClick(MouseEvent mouseEvent) {
-        if(gameOver){
-            changeScreen("fxml-layouts/game-over.fxml/", mouseEvent);
-        } else {
-            changeScreen("fxml-layouts/mode-selection.fxml/", mouseEvent);
         }
     }
 

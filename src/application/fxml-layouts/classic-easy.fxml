@@ -25,10 +25,6 @@
                   <Font size="24.0" />
                </font>
             </Label>
-             <Button fx:id="btnBack" layoutX="16.0" layoutY="21.0" mnemonicParsing="false" onMouseClicked="#handleBtnBackClick" prefHeight="35.0" prefWidth="161.0" styleClass="main-button" text="Mode Selection">
-               <font>
-                  <Font size="10.0" />
-               </font></Button>
             <Label fx:id="displayScore" layoutX="69.0" layoutY="86.0" prefHeight="29.0" prefWidth="117.0">
                <font>
                   <Font size="18.0" />
