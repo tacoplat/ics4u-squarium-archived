@@ -3,7 +3,11 @@ package application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
@@ -13,10 +17,13 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 
 import javax.swing.*;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Random;
 import java.util.ResourceBundle;
 
 import java.util.concurrent.TimeUnit;
@@ -49,17 +56,26 @@ public class GameController extends Controller implements Initializable {
     private Pane displayHoldPane;
 
     @FXML
-    private Button btnPlay;
-
-
+    public Label displayScore;
 
     @FXML
-    private Label scoreLabel;
+    public Label displayLineCleared;
+
+    @FXML
+    private Button btnPlay;
+
+    @FXML
+    private Button btnBack;
 
     public static int keyPressPerSecond = 2;
     public static int movePerSecond = 1;
+    public static int lockMode = 0;
+    public static int difficulty = 0;
     public static int staticScore;
 
+    private int lockModeCounter;
+    private int lockedMaxNumber;
+    private String lockedPieceName;
     private boolean gameOver;
     private boolean isRunning;
     private int ignoreKeyPressCounter;
@@ -81,6 +97,7 @@ public class GameController extends Controller implements Initializable {
     // ScheduledFuture can be used to get time left before next task execution
     private ScheduledFuture<?> scheduledFuture;
 
+    private Random random;
     private boolean debug;
 
     /**
@@ -95,6 +112,9 @@ public class GameController extends Controller implements Initializable {
      */
     private void setDefault() {
         debug = true;
+        lockModeCounter = 0;
+        lockedMaxNumber = 0;
+        lockedPieceName = "";
         score = 0;
         lineNum = 0;
         gameOver = false;
@@ -102,11 +122,22 @@ public class GameController extends Controller implements Initializable {
         ignoreKeyPressCounter = 0;
         clearRowLock = false;
         hardDrop = false;
+        random = new Random();
 
         gameBoard = new GameBoard();
         tetromino = null;
-        nextObj = new Tetromino();
+        nextObj = null;
         holdObj = null;
+    }
+
+    private void resetGame(){
+        setDefault();
+        leftPane.getChildren().clear();
+        displayNextPane.getChildren().clear();
+        displayHoldPane.getChildren().clear();
+        displayScore.setText("");
+        displayLineCleared.setText("");
+        btnPlay.setText("PLAY");
     }
 
     /**
@@ -128,13 +159,18 @@ public class GameController extends Controller implements Initializable {
 
     public void clearParkedRows() {
         if (!clearRowLock) {
-            // Todo: block the button click and keypress
+            // Meke sure no more clearParkedRows actions before the current call was finished
             clearRowLock = true;
+
+            // Disable any movement until the clearParkedRows process finished
             boolean isRunningCached = false;
             if (isRunning) {
                 isRunningCached = true;
                 isRunning = false;
             }
+
+            // Record the lines of parked blocks was removed by current action
+            int lineRemoved = 0;
 
             int[][] grid = gameBoard.getGrid();
             var parkedBlocks = gameBoard.getParkedBlocks();
@@ -152,7 +188,14 @@ public class GameController extends Controller implements Initializable {
                             leftPane.getChildren().remove(block.getUiBox());
                             parkedBlocks.remove(block);
                         }
+
+                        // Increase the number of total lines removed
                         lineNum++;
+
+                        // Increase the number of lines removed at current move action
+                        lineRemoved++;
+
+                        displayLineCleared.setText(String.valueOf(lineNum));
                         Arrays.fill(grid[row], 0);
                         for (int k = row - 1; k >= topRowIdx; k--) {
                             for (int m = 0; m < WIDE; m++) {
@@ -167,12 +210,25 @@ public class GameController extends Controller implements Initializable {
                     }
                 }
             }
-            if (count == 1) score += 40;
-            else if (count == 2) score += 100;
-            else if (count == 3) score += 300;
-            else if (count >= 4) score += 1200;
-            System.out.println("Rows cleared: " + count);
-            scoreLabel.setText(String.valueOf(score));
+          
+            // Reference: https://www.codewars.com/kata/5da9af1142d7910001815d32
+            // Increase scores based on the lines removed and the game diff
+            switch (lineRemoved){
+                case 1:
+                    score += difficulty * 80;
+                    break;
+                case 2:
+                    score += difficulty * 200;
+                    break;
+                case 3:
+                    score += difficulty * 600;
+                    break;
+                case 4:
+                    score += difficulty * 2400;
+                    break;
+            }
+            displayScore.setText(String.valueOf(score));
+
             if (isRunningCached) {
                 isRunning = true;
             }
@@ -182,6 +238,8 @@ public class GameController extends Controller implements Initializable {
     }
 
     public void addNextTetromino() {
+        if(nextObj == null) generateNextObj();
+
         tetromino = new Tetromino(nextObj.getPieceName(), true);
         // Display the new added Tetromino shape on the Game Board
         for (TetroBox block : tetromino.getBlocks()) {
@@ -195,7 +253,7 @@ public class GameController extends Controller implements Initializable {
             }
         }
 
-        nextObj = new Tetromino();
+        generateNextObj();
 
         // Display the next Tetromino shape on the Right Pane
         for (TetroBox block : nextObj.getBlocks()) {
@@ -205,54 +263,75 @@ public class GameController extends Controller implements Initializable {
     }
 
     private void holdTetromino() {
-        String pieceNameTetromino = tetromino.getPieceName();
-        if (holdObj != null) {
-            // Remove the current Tetromino shape from the Game Board Pane
-            for (TetroBox block : tetromino.getBlocks()) {
-                leftPane.getChildren().remove(block.getUiBox());
-            }
-            tetromino.changeShape(holdObj.getPieceName());
-            // Display the new added Tetromino shape on the Game Board
-            for (TetroBox block : tetromino.getBlocks()) {
-                leftPane.getChildren().add(block.getUiBox());
-            }
+        if (tetromino != null) {
+            String pieceNameTetromino = tetromino.getPieceName();
+            if (holdObj != null) {
+                // Remove the current Tetromino shape from the Game Board Pane
+                for (TetroBox block : tetromino.getBlocks()) {
+                    leftPane.getChildren().remove(block.getUiBox());
+                }
+                tetromino.changeShape(holdObj.getPieceName());
+                // Display the new added Tetromino shape on the Game Board
+                for (TetroBox block : tetromino.getBlocks()) {
+                    leftPane.getChildren().add(block.getUiBox());
+                }
 
-            // Remove the previous hold Tetromino shape from the Right Pane
-            for (TetroBox block : holdObj.getBlocks()) {
-                displayHoldPane.getChildren().remove(block.getUiBox());
-            }
-            // Create the Tetromino for hold based on the piece name
-            holdObj = new Tetromino(pieceNameTetromino, false);
-            // Display the updated hold Tetromino shape on the Game Board
-            for (TetroBox block : holdObj.getBlocks()) {
-                displayHoldPane.getChildren().add(block.getUiBox());
-            }
-        } else {
-            holdObj = new Tetromino(pieceNameTetromino, false);
-            // Display the updated hold Tetromino shape on the Game Board
-            for (TetroBox block : holdObj.getBlocks()) {
-                displayHoldPane.getChildren().add(block.getUiBox());
-            }
+                // Remove the previous hold Tetromino shape from the Right Pane
+                for (TetroBox block : holdObj.getBlocks()) {
+                    displayHoldPane.getChildren().remove(block.getUiBox());
+                }
+                // Create the Tetromino for hold based on the piece name
+                holdObj = new Tetromino(pieceNameTetromino, false);
+                // Display the updated hold Tetromino shape on the Game Board
+                for (TetroBox block : holdObj.getBlocks()) {
+                    displayHoldPane.getChildren().add(block.getUiBox());
+                }
+            } else {
+                holdObj = new Tetromino(pieceNameTetromino, false);
+                // Display the updated hold Tetromino shape on the Game Board
+                for (TetroBox block : holdObj.getBlocks()) {
+                    displayHoldPane.getChildren().add(block.getUiBox());
+                }
 
-            // Remove the current Tetromino shape from the Game Board Pane
-            for (TetroBox block : tetromino.getBlocks()) {
-                leftPane.getChildren().remove(block.getUiBox());
-            }
-            tetromino.changeShape(nextObj.getPieceName());
-            // Display the new added Tetromino shape on the Game Board
-            for (TetroBox block : tetromino.getBlocks()) {
-                leftPane.getChildren().add(block.getUiBox());
-            }
+                // Remove the current Tetromino shape from the Game Board Pane
+                for (TetroBox block : tetromino.getBlocks()) {
+                    leftPane.getChildren().remove(block.getUiBox());
+                }
+                tetromino.changeShape(nextObj.getPieceName());
+                // Display the new added Tetromino shape on the Game Board
+                for (TetroBox block : tetromino.getBlocks()) {
+                    leftPane.getChildren().add(block.getUiBox());
+                }
 
-            // Remove the next shape from the Game Board Pane
-            for (TetroBox block : nextObj.getBlocks()) {
-                displayNextPane.getChildren().remove(block.getUiBox());
+                // Remove the next shape from the Game Board Pane
+                for (TetroBox block : nextObj.getBlocks()) {
+                    displayNextPane.getChildren().remove(block.getUiBox());
+                }
+                generateNextObj();
+                // Display the next Tetromino shape on the Game Board
+                for (TetroBox block : nextObj.getBlocks()) {
+                    displayNextPane.getChildren().add(block.getUiBox());
+                }
             }
+        }
+    }
+
+    private void generateNextObj(){
+        if(lockMode == 1) {
+            if(lockModeCounter == 0){
+                // Generate random number between 4 to 8
+                lockedMaxNumber = random.nextInt(8 - 4 + 1) + 4;
+                lockedPieceName = Tetromino.generateRandomPieceName();
+                if (debug) System.out.println("lockedMaxNumber: " + lockedMaxNumber + "  lockedPieceName: " + lockedPieceName);
+                lockModeCounter++;
+            } else {
+                if (debug) System.out.println("lockModeCounter: " + lockModeCounter + "  lockedPieceName: " + lockedPieceName);
+                lockModeCounter++;
+                if(lockModeCounter>lockedMaxNumber) lockModeCounter = 0;
+            }
+            nextObj = new Tetromino(lockedPieceName, false);
+        }else {
             nextObj = new Tetromino();
-            // Display the next Tetromino shape on the Game Board
-            for (TetroBox block : nextObj.getBlocks()) {
-                displayNextPane.getChildren().add(block.getUiBox());
-            }
         }
     }
 
@@ -262,6 +341,31 @@ public class GameController extends Controller implements Initializable {
             gameBoard.addToBoard(tetromino);
             clearParkedRows();
         }
+    }
+
+    /**
+     * Check if the parked blocks reached the Gameboard top
+     * @return true: at least one parked blocks the top; false: no parked block at the top.
+     */
+    private boolean reachedTop() {
+        return Arrays.stream(gameBoard.getGrid()[0]).anyMatch(idx -> idx == 1);
+    }
+
+    private void processGameOver() {
+        isRunning = false;
+        gameOver = true;
+        btnPlay.setText("RESTART");
+      
+        String mode = ModeSelectionController.modeSelect;
+        ScoreboardController.writeScoreToFile(Controller.currentProfile.getPlayerName(), mode.substring(0, 1).toUpperCase() + mode.substring(1), score);
+        staticScore = score;
+        btnPlay.setOnAction(this::openGameOver);
+        try {
+            Thread.sleep(400);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        btnPlay.fire();
     }
 
     /**
@@ -275,62 +379,83 @@ public class GameController extends Controller implements Initializable {
             ignoreKeyPressCounter--;
         }
 
-        // Run one step per second or two steps per second if current step is greater than speed up step
+        // If the game is running, move the tetromino down based on the movePerSecond setting,
+        // or move the tetromino down at the full speed (one step per millisecond) to achieve the hardDrop effect
         if (isRunning && (counter % (1000 / movePerSecond) == 1 || hardDrop)) {
-            if (debug) System.out.println("Running --------------");
             Platform.runLater(() -> {
-
-                // Todo: Game over: reahed top or new generate can't move down
-                if (Arrays.stream(gameBoard.getGrid()[0]).anyMatch(idx -> idx == 1)) {
-                    // Game over
-                    if (debug) System.out.println("GAME OVER --------------");
-                    isRunning = false;
-                    gameOver = true;
-                    String mode = ModeSelectionController.modeSelect;
-                    ScoreboardController.writeScoreToFile(Controller.currentProfile.getPlayerName(), mode.substring(0, 1).toUpperCase() + mode.substring(1), score);
-                    staticScore = score;
-                    btnPlay.setText("GAME OVER");
-                    btnPlay.setOnAction(this::openGameOver);
-                    try {
-                        Thread.sleep(400);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    btnPlay.fire();
-
-                   /* Text over = new Text("GAME OVER");
-                    over.setFill(Color.RED);
-                    over.setStyle("-fx-font: 70 arial;");
-                    over.setY(250);
-                    over.setX(10);
-                    leftPane.getChildren().add(over); */
-
-                }
-
-                if (tetromino == null) addNextTetromino();
-
-                boolean moved = tetromino.move(gameBoard.getIndexList(), "down");
-                if (!moved) {
-                    // Touched the bottom or other blocks
-                    hardDrop = false;
-                    // Generate new Tetromino
-                    addParkedTetromino();
-                    clearParkedRows();
-                    addNextTetromino();
-                }
+                btnPlay.requestFocus();
+                processMoveDown(true);
             });
         }
     };
 
+    public void processMoveDown(boolean auto){
+        if (nextObj == null) {
+            generateNextObj();
+            return;
+        }
+
+        if(tetromino == null) return;
+
+        int moved = tetromino.move(gameBoard.getIndexList(), "down");
+        if (moved == 0) { // Touched the bottom or other blocks
+            if(hardDrop) {
+                hardDrop = false;
+                // add score based on the row dropped and difficulty
+                score += difficulty * (HIGH-tetromino.getBaseRowNumber());
+                displayScore.setText(String.valueOf(score));
+            }
+            addParkedTetromino();
+            clearParkedRows();
+
+            // Check Game over: if parked blocks reached the top or new generated blocks can't move down
+            if(reachedTop()) {
+                processGameOver();
+                return;
+            }
+
+            // Generate new Tetromino
+            addNextTetromino();
+        } else if(moved == 2) {  // Game over since new generated block can't move down
+            hardDrop = false;
+            processGameOver();
+        } else if(!auto) {
+            // if moved down by player, add score based on difficulty
+            score += difficulty;
+            displayScore.setText(String.valueOf(score));
+        }
+    }
+
+    private void processAction(){
+        if (gameOver) {
+            btnPlay.setText("PLAY");
+            btnBack.setText("Mode Selection");
+            resetGame();
+        } else {
+            isRunning = !isRunning;
+            if (isRunning) {
+                if(nextObj == null) generateNextObj();
+                if(tetromino == null) addNextTetromino();
+                btnPlay.setText("PAUSE");
+            } else {
+                btnPlay.setText("PLAY");
+            }
+        }
+    }
+
+    @FXML
+    public void handleBtnBackClick(MouseEvent mouseEvent) {
+        if(gameOver){
+            changeScreen("fxml-layouts/game-over.fxml/", mouseEvent);
+        } else {
+            changeScreen("fxml-layouts/mode-selection.fxml/", mouseEvent);
+        }
+    }
+
     // Handles mouse click
     @FXML
     public void handleMouseClick(MouseEvent mouseEvent) {
-        isRunning = !isRunning;
-        if (isRunning) {
-            btnPlay.setText("PAUSE");
-        } else {
-            btnPlay.setText("PLAY");
-        }
+        processAction();
     }
 
     // Handles arrow key press to move
@@ -371,15 +496,7 @@ public class GameController extends Controller implements Initializable {
             case DOWN:     // Non-numpad down arrow key pressed
             case KP_DOWN:  // Numeric keypad down arrow key pressed
                 if (isRunning) {
-                    boolean moved = tetromino.move(gameBoard.getIndexList(), "down");
-                    if (!moved) {
-                        // Touched the bottom or other blocks
-                        // Generate new Tetromino
-                        addParkedTetromino();
-                        // Todo: double check and add back
-                        clearParkedRows();
-                        addNextTetromino();
-                    }
+                    processMoveDown(false);
                 }
                 break;
             case X:
@@ -391,7 +508,6 @@ public class GameController extends Controller implements Initializable {
                     } else {
                         tetromino.rotate(gameBoard.getIndexList(), true);
                     }
-
                 }
                 break;
             case Z:
@@ -410,29 +526,48 @@ public class GameController extends Controller implements Initializable {
                 break;
             case C:
                 if (isRunning) {
-                    if (tetromino != null) {
-                        holdTetromino();
-                    }
+                    holdTetromino();
                 }
                 break;
             case ENTER:    // Enter key pressed
-                if (gameOver) {
-                    btnPlay.setText("PLAY");
-                    setDefault();
-                } else {
-                    isRunning = !isRunning;
-                    if (isRunning) {
-                        btnPlay.setText("PAUSE");
-                    } else {
-                        btnPlay.setText("PLAY");
-                    }
-                }
+                processAction();
                 break;
         }
     }
 
     public static int getStaticScore() {
         return staticScore;
+    }
+    /**
+     * Changes the current scene to another FXML layout.
+     *
+     * @param path - The path to the FXML layout.
+     * @param event - JavaFX ActionEvent
+     */
+    public void changeScreen(String path, MouseEvent event) {
+
+        // Set the target path to the input from the parameter.
+        URL fxmlURL = this.getClass().getResource(path);
+
+        // Get the references of the scene and stage of the pressed button.
+        Scene scene = ((Node) event.getTarget()).getScene();
+        Stage stage = (Stage) scene.getWindow();
+
+        try {
+            // Load the new layout into a new root element.
+            Parent root = FXMLLoader.load(fxmlURL);
+
+            // Create a new scene and set the root and stylesheet.
+            Scene newScene = new Scene(root);
+            newScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+
+            // Set the scene.
+            stage.setScene(newScene);
+
+        } catch (IOException e) {
+            System.out.println("Could not load the specified layout.");
+            e.printStackTrace();
+        }
     }
 
 }
