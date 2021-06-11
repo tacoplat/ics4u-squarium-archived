@@ -14,7 +14,6 @@ public class ProfileController extends Controller {
 
     // Instance fields
     ObservableList<Profile> profileList = FXCollections.observableArrayList();
-    private static String defaultProfilePath = "src/application/appdata/";
     private final boolean debug = false;
 
     // FXML Id elements
@@ -41,7 +40,7 @@ public class ProfileController extends Controller {
         profileTable.setFixedCellSize(24);
 
         // Update list and sort by ascending ID.
-        obtainProfilesFromFile(defaultProfilePath + "/profile.save");
+        obtainProfilesFromFile(Controller.getDefaultPath() + "/profile.save");
         sortProfilesById(profileList);
 
         // Try to set the default selected profile to the current one.
@@ -101,7 +100,7 @@ public class ProfileController extends Controller {
      */
     public void updateProfileFile() {
         try {
-            FileWriter fw = new FileWriter(defaultProfilePath + "/profile.save");
+            FileWriter fw = new FileWriter(Controller.getDefaultPath() + "/profile.save");
 
             // Blank string to hold written content.
             StringBuilder entry = new StringBuilder();
@@ -299,27 +298,36 @@ public class ProfileController extends Controller {
 
         // Check if the selected profile is not "Create New Profile".
         if (idToDelete != 0) {
-            int index = 1;
+            Alert dialog = new Alert(Alert.AlertType.CONFIRMATION);
 
-            // Iterate through the list and find the element with the specified ID.
-            for (int i = 0; i < profileList.size(); i++) {
-                if (profileList.get(i).getId() == idToDelete) {
-                    index = i;
+            dialog.setTitle("Delete Profile");
+            dialog.setContentText("Are you sure you want to delete this profile?\nThis action cannot be reverted.");
+
+            dialog.setHeaderText(null);
+            dialog.setGraphic(null);
+            configurePopupIcons(dialog);
+
+            ((Button) dialog.getDialogPane().lookupButton(ButtonType.OK)).setText("Delete"); // Relabel the ok button.
+
+            Optional<ButtonType> result = dialog.showAndWait();
+
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                int index = 1;
+
+                // Iterate through the list and find the element with the specified ID.
+                for (int i = 0; i < profileList.size(); i++) {
+                    if (profileList.get(i).getId() == idToDelete) {
+                        index = i;
+                    }
                 }
-            }
 
-            // Remove from list and update file.
-            profileList.remove(index);
-            updateProfileFile();
+                // Remove from list and update file.
+                profileList.remove(index);
+                updateProfileFile();
+            }
         }
     }
 
-    /**
-     * Set the default profile path
-     * @param path - Path to the save file.
-     */
-    public static void setDefaultProfilePath(String path) {
-        defaultProfilePath = path;
-    }
+
 
 }
