@@ -1,8 +1,6 @@
 package application;
 
 import javafx.scene.paint.Color;
-
-import java.sql.SQLOutput;
 import java.util.*;
 
 import static application.Common.HIGH;
@@ -39,10 +37,14 @@ public class Tetromino {
         setColor();
     }
 
-    private String generateRandomPieceName() {
+    public static String generateRandomPieceName() {
         String pieceName;
-        // Pick random color between 0-100
-        int randNum = (int) (Math.random() * 100);
+
+        // Java util object to generate random int number
+        Random random = new Random();
+
+        // Generate random number between 0-100
+        int randNum = random.nextInt(100);
 
         if (randNum < 15) {
             pieceName = "j";
@@ -212,18 +214,29 @@ public class Tetromino {
 
     /**
      * @param direction
-     * @return true: free to move; false: blocked;
+     * @return 0:can't move; 1: free to move; 2: Game over: new generated block can't move down;
      */
-    public boolean isMovable(List<Integer> parkedBlocksKeys, String direction) {
-        if (isMovingAgainstEdge(direction)) return false;
+    public int isMovable(List<Integer> parkedBlocksKeys, String direction) {
+        if (isMovingAgainstEdge(direction)) return 0;
 
         List<Integer> nextKeys = getMovedIndexList(direction);
 
         for (Integer parkedKey : parkedBlocksKeys) {
-            if (nextKeys.contains(parkedKey)) return false;
+            if (nextKeys.contains(parkedKey)) {
+                if(direction == "left" || direction == "right") {
+                    return 0;
+                } else {
+                    if(parkedKey <24){
+                        return 2;
+                    }else{
+                        return 0;
+                    }
+
+                }
+            }
         }
 
-        return true;
+        return 1;
     }
 
     /**
@@ -249,11 +262,11 @@ public class Tetromino {
 
     /**
      * @param direction
-     * @return 1: Moved successfully; 2: Touched the right edge; 3: Touched the left edge; 4: Touched the bottom;
+     * @return 0:can't move; 1: Moved successfully; 2: Game over: new generated block can't move down;
      */
-    public boolean move(List<Integer> parkedBlocksKeys, String direction) {
-        boolean movable = isMovable(parkedBlocksKeys, direction);
-        if (movable) {
+    public int move(List<Integer> parkedBlocksKeys, String direction) {
+        int movable = isMovable(parkedBlocksKeys, direction);
+        if (movable == 1) {
             for (TetroBox block : blocks) {
                 switch (direction) {
                     case "right":
@@ -376,6 +389,11 @@ public class Tetromino {
         return null;
     }
 
+    public int getBaseRowNumber(){
+        if(blocks.size()>0) return blocks.get(0).getBaseRow();
+
+        return 0;
+    }
 
     public List<Integer> getIndexList() {
         List<Integer> indexList = new ArrayList<>();
