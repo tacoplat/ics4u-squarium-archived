@@ -148,9 +148,12 @@ public class ScoreboardController extends Controller {
                 // Split the line by the delimiter, store in a String array.
                 String[] extract = str.split(">%");
 
-                // Add the data to the TableView list to display.
-                Scoreboard temp = new Scoreboard(extract[0], extract[1], Integer.valueOf(extract[2]));
-                scores.add(temp);
+                if (extract.length == 3) {
+                    // Add the data to the TableView list to display.
+                    Scoreboard temp = new Scoreboard(extract[0], extract[1], Integer.valueOf(extract[2]));
+                    scores.add(temp);
+                }
+
             }
 
             fr.close();

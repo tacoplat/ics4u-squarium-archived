@@ -1,9 +1,11 @@
 package application;
 
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -12,6 +14,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
+import javax.swing.*;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.ResourceBundle;
@@ -26,7 +29,7 @@ import static application.Common.*;
 /**
  * Controller for the game board
  */
-public class GameController implements Initializable {
+public class GameController extends Controller implements Initializable {
 
     // Initialize variables
 
@@ -48,8 +51,14 @@ public class GameController implements Initializable {
     @FXML
     private Button btnPlay;
 
+
+
+    @FXML
+    private Label scoreLabel;
+
     public static int keyPressPerSecond = 2;
     public static int movePerSecond = 1;
+    public static int staticScore;
 
     private boolean gameOver;
     private boolean isRunning;
@@ -63,7 +72,7 @@ public class GameController implements Initializable {
 
     // Counter for score and number of lines cleared
     private int lineNum;
-    private int score;
+    private int score = 0;
 
     // Timer counter
     private int counter;
@@ -130,11 +139,13 @@ public class GameController implements Initializable {
             int[][] grid = gameBoard.getGrid();
             var parkedBlocks = gameBoard.getParkedBlocks();
             int topRowIdx = HIGH;
+            int count = 0;
             for (int row = 0; row < HIGH; row++) {
                 if (Arrays.stream(grid[row]).anyMatch(idx -> idx == 1)) {
                     if (topRowIdx == HIGH) topRowIdx = row;
                     if (Arrays.stream(grid[row]).allMatch(idx -> idx == 1)) {
                         // Delete the row and move the blocks on top one row down
+                        count++;
                         for (int m = 0; m < WIDE; m++) {
                             int key = row * WIDE + m;
                             var block = gameBoard.findBlockByIndex(key);
@@ -143,7 +154,6 @@ public class GameController implements Initializable {
                         }
                         lineNum++;
                         Arrays.fill(grid[row], 0);
-
                         for (int k = row - 1; k >= topRowIdx; k--) {
                             for (int m = 0; m < WIDE; m++) {
                                 if (grid[k][m] == 1) {
@@ -157,6 +167,12 @@ public class GameController implements Initializable {
                     }
                 }
             }
+            if (count == 1) score += 40;
+            else if (count == 2) score += 100;
+            else if (count == 3) score += 300;
+            else if (count >= 4) score += 1200;
+            System.out.println("Rows cleared: " + count);
+            scoreLabel.setText(String.valueOf(score));
             if (isRunningCached) {
                 isRunning = true;
             }
@@ -270,14 +286,25 @@ public class GameController implements Initializable {
                     if (debug) System.out.println("GAME OVER --------------");
                     isRunning = false;
                     gameOver = true;
+                    String mode = ModeSelectionController.modeSelect;
+                    ScoreboardController.writeScoreToFile(Controller.currentProfile.getPlayerName(), mode.substring(0, 1).toUpperCase() + mode.substring(1), score);
+                    staticScore = score;
                     btnPlay.setText("GAME OVER");
+                    btnPlay.setOnAction(this::openGameOver);
+                    try {
+                        Thread.sleep(400);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    btnPlay.fire();
 
-                    Text over = new Text("GAME OVER");
+                   /* Text over = new Text("GAME OVER");
                     over.setFill(Color.RED);
                     over.setStyle("-fx-font: 70 arial;");
                     over.setY(250);
                     over.setX(10);
-                    leftPane.getChildren().add(over);
+                    leftPane.getChildren().add(over); */
+
                 }
 
                 if (tetromino == null) addNextTetromino();
@@ -402,6 +429,10 @@ public class GameController implements Initializable {
                 }
                 break;
         }
+    }
+
+    public static int getStaticScore() {
+        return staticScore;
     }
 
 }
