@@ -1,7 +1,9 @@
-# Final Project
+# SQUARIUM - Final Project
 #### By: Andy Zhen and Crystal Zhang
 
 *(With JavaFx)*
+
+### [USER GUIDE](https://docs.google.com/document/d/16JSJm0jhw9IWmJzCvQTwFJJGiJblaVWmKbR1jW2I68U/edit)
 
 ### [Project Statement Scope](https://docs.google.com/document/d/1xLI6LGGu44HKDfOvJ3klcLbo6vebbfh391KwUjpQKhw/edit)
 
