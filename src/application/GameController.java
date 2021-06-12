@@ -289,22 +289,6 @@ public class GameController extends Controller implements Initializable {
             newKey = Common.calculateIndex(newRow, newColumn);
             nextKeys.add(newKey);
         }
-    }
-    /**
-     * Method for the hold function of game. Holds the current tetromino piece that's on the game board and puts onto right pane
-     */
-    private void holdTetromino() {
-        String pieceNameTetromino = tetromino.getPieceName();
-        if (holdObj != null) {
-            // Remove the current Tetromino shape from the Game Board Pane
-            for (TetroBox block : tetromino.getBlocks()) {
-                leftPane.getChildren().remove(block.getUiBox());
-            }
-            tetromino.changeShape(holdObj.getPieceName());
-            // Display the new added Tetromino shape on the Game Board
-            for (TetroBox block : tetromino.getBlocks()) {
-                leftPane.getChildren().add(block.getUiBox());
-            }
 
         for (Integer parkedKey : gameBoard.getIndexList()) {
             if (nextKeys.contains(parkedKey)) {
@@ -315,6 +299,9 @@ public class GameController extends Controller implements Initializable {
         return false;
     }
 
+    /**
+     * Method for the hold function of game. Holds the current tetromino piece that's on the game board and puts onto right pane
+     */
     private void holdTetromino() {
         if (tetromino != null) {
             int baseRowNumber = tetromino.getBaseRowNumber();

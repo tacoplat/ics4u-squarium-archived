@@ -25,26 +25,6 @@ public class ModeSelectionController extends Controller {
     URL fxmlURL;
 
     /**
-     * Changes the current scene to another FXML layout.
-     *
-     * @param path - The path to the FXML layout.
-     * @param event - JavaFX ActionEvent
-     */
-    private void changeScreen(String path, ActionEvent event) {
-
-        fxmlURL = this.getClass().getResource(path);
-        Scene scene = ((Button) event.getTarget()).getScene();
-
-        try {
-            Parent root = loader.load(fxmlURL);
-            scene.setRoot(root);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
      * Opens game with easy settings
      * @param event JavaFX ActionEvent
      */
