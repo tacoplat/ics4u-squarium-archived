@@ -1,20 +1,24 @@
 package application;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.SplitPane;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -23,6 +27,7 @@ import javax.swing.*;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.Random;
 import java.util.ResourceBundle;
 
@@ -63,6 +68,9 @@ public class GameController extends Controller implements Initializable {
 
     @FXML
     private Button btnPlay;
+
+    @FXML
+    private Button dummyBtn;
 
 
     public static int keyPressPerSecond = 2;
@@ -436,7 +444,64 @@ public class GameController extends Controller implements Initializable {
                 if(tetromino == null) addNextTetromino();
                 btnPlay.setText("PAUSE");
             } else {
-                btnPlay.setText("PLAY");
+                // Create and configure a pop up dialog.
+                Dialog<ButtonType> dialog = new Dialog<>();
+                dialog.setTitle("Game Paused");
+                configurePopupIcons(dialog);
+
+                // Apply the CSS stylesheet
+                dialog.getDialogPane().getScene().getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+
+                // Configure the buttons and add to the dialog
+                ButtonType resume = new ButtonType("Resume Game", ButtonBar.ButtonData.CANCEL_CLOSE);
+                ButtonType mainScreen = new ButtonType("Return to Title Screen", ButtonBar.ButtonData.CANCEL_CLOSE);
+                ButtonType modeSelect = new ButtonType("Change Game Mode", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+                dialog.getDialogPane().getButtonTypes().addAll(resume, mainScreen, modeSelect);
+
+                // Add the "main-button" style to each button
+                for (ButtonType btn : dialog.getDialogPane().getButtonTypes()) {
+                    Button currentBtn = (Button) dialog.getDialogPane().lookupButton(btn);
+                    currentBtn.getStyleClass().add("main-button");
+                }
+
+                Optional<ButtonType> result = dialog.showAndWait(); // Wait for result.
+
+                int action = 0;
+
+                // Get user input
+                if (result.isPresent()) {
+                    // Resume the game after a 2s pause.
+                    if (result.get() == resume) {
+                        dialog.close();
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        isRunning = !isRunning;
+                    } else if (result.get() == mainScreen) {
+                        action = 1;
+                        dialog.close();
+                    } else if (result.get() == modeSelect) {
+                        action = 2;
+                        dialog.close();
+                    }
+                }
+
+                // Assign actions to the dummy button, then trigger.
+                if (action > 0) {
+                    switch (action) {
+                        case 1:
+                            dummyBtn.setOnAction(e -> changeScreen("fxml-layouts/main-screen.fxml", e));
+                            dummyBtn.fire();
+                            break;
+                        case 2:
+                            dummyBtn.setOnAction(e -> changeScreen("fxml-layouts/mode-selection.fxml", e));
+                            dummyBtn.fire();
+                            break;
+                    }
+                }
             }
         }
     }

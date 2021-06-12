@@ -45,6 +45,7 @@
                   <Font size="18.0" />
                </font>
             </Label>
+            <Button fx:id="dummyBtn" layoutX="140.0" layoutY="14.0" mnemonicParsing="false" text="Button" visible="false" />
          </children></AnchorPane>
   </items>
 </SplitPane>
