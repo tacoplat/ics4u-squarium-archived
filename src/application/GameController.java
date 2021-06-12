@@ -27,6 +27,7 @@ import javax.swing.*;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.ResourceBundle;
@@ -268,10 +269,38 @@ public class GameController extends Controller implements Initializable {
 
     }
 
+    public boolean hasCollision(Tetromino replaceObj, int baseRow, int baseColumn) {
+        List<Integer> nextKeys = replaceObj.getIndexList();
+        int newKey, newRow, newColumn;
+        for (TetroBox block : replaceObj.getBlocks()) {
+            newRow = baseRow + block.getOffsetRow();
+            newColumn = baseColumn + block.getOffsetColumn();
+            // Check if block out of boundary
+            if (newRow < 0 || newRow >= HIGH || newColumn < 0 || newColumn >= WIDE) return true;
+
+            newKey = Common.calculateIndex(newRow, newColumn);
+            nextKeys.add(newKey);
+        }
+
+        for (Integer parkedKey : gameBoard.getIndexList()) {
+            if (nextKeys.contains(parkedKey)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private void holdTetromino() {
         if (tetromino != null) {
+            int baseRowNumber = tetromino.getBaseRowNumber();
+            int baseColumnNumber = tetromino.getBaseColumnNumber();
+
             String pieceNameTetromino = tetromino.getPieceName();
             if (holdObj != null) {
+                // Check if the on hold Tetromino which supposed to replace the current Tetromino has conflict with the parked blocks
+                if (hasCollision(holdObj, baseRowNumber, baseColumnNumber)) return;
+
                 // Remove the current Tetromino shape from the Game Board Pane
                 for (TetroBox block : tetromino.getBlocks()) {
                     leftPane.getChildren().remove(block.getUiBox());
@@ -293,6 +322,9 @@ public class GameController extends Controller implements Initializable {
                     displayHoldPane.getChildren().add(block.getUiBox());
                 }
             } else {
+                // Check if the on hold Tetromino which supposed to replace the current Tetromino has conflict with the parked blocks
+                if (hasCollision(nextObj, baseRowNumber, baseColumnNumber)) return;
+
                 holdObj = new Tetromino(pieceNameTetromino, false);
                 // Display the updated hold Tetromino shape on the Game Board
                 for (TetroBox block : holdObj.getBlocks()) {
