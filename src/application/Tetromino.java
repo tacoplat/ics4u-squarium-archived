@@ -395,6 +395,12 @@ public class Tetromino {
         return 0;
     }
 
+    public int getBaseColumnNumber(){
+        if(blocks.size()>0) return blocks.get(0).getBaseColumn();
+
+        return 0;
+    }
+
     public List<Integer> getIndexList() {
         List<Integer> indexList = new ArrayList<>();
         for (TetroBox block : blocks) {
