@@ -41,12 +41,9 @@ public class ProfileController extends Controller {
         profileTable.setItems(profileList);
         profileTable.setFixedCellSize(24);
 
-        String profileSave = Controller.getDefaultPath() + "/profile.save";
-
         try {
             // Generate directory if it does not exist
             Files.createDirectories(Paths.get(Controller.getDefaultPath()));
-            Files.createFile(Paths.get(profileSave));
         } catch (IOException ex) {
             System.out.printf("File creation error: " + ex.getMessage());
         }
