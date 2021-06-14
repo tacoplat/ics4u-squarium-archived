@@ -88,3 +88,24 @@
 .button-icon {
   pointer-events: false;
 }
+
+/* Main Game Panel Style */
+
+.layout-results, .layout-next, .layout-hold {
+  -fx-border-color: #A690F3;
+  -fx-border-width: 1;
+}
+
+.left-pane {
+  -fx-background-color: #e8edfd,
+    linear-gradient(from 0.0px 0.0px to 25.0px  0.0px, repeat, white 5%, transparent 2%),
+    linear-gradient(from 0.0px 0.0px to  0.0px 25.0px, repeat, white 5%, transparent 2%);
+}
+
+.display-score {
+  -fx-background-color: #b1dafa;
+}
+
+.display-line-cleared {
+  -fx-background-color: #b1dafa;
+}

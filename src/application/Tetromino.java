@@ -126,6 +126,7 @@ public class Tetromino {
      * @param baseColumn The last column of blocks of the shape
      */
     private void GenerateBlocks(int baseRow, int baseColumn) {
+        baseGridSize = 3;
         switch (pieceName) {
             case "o":
                 // X X

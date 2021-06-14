@@ -35,7 +35,7 @@ public class ModeSelectionController extends Controller {
         GameController.keyPressPerSecond = 6;
         GameController.lockMode = 0;
         GameController.difficulty = 1;
-        changeScreen("fxml-layouts/classic-easy.fxml/", event);
+        changeScreen("fxml-layouts/game-main.fxml/", event);
     }
 
     /**
@@ -49,7 +49,7 @@ public class ModeSelectionController extends Controller {
         GameController.keyPressPerSecond = 8;
         GameController.lockMode = 0;
         GameController.difficulty = 2;
-        changeScreen("fxml-layouts/classic-easy.fxml/", event);
+        changeScreen("fxml-layouts/game-main.fxml/", event);
     }
 
     /**
@@ -63,7 +63,7 @@ public class ModeSelectionController extends Controller {
         GameController.keyPressPerSecond = 25;
         GameController.lockMode = 0;
         GameController.difficulty = 3;
-        changeScreen("fxml-layouts/classic-easy.fxml/", event);
+        changeScreen("fxml-layouts/game-main.fxml/", event);
     }
 
     /**
@@ -77,7 +77,7 @@ public class ModeSelectionController extends Controller {
         GameController.keyPressPerSecond = 25;
         GameController.lockMode = 0;
         GameController.difficulty = 3;
-        changeScreen("fxml-layouts/classic-easy.fxml/", event);
+        changeScreen("fxml-layouts/game-main.fxml/", event);
     }
 
     /**
@@ -91,7 +91,7 @@ public class ModeSelectionController extends Controller {
         GameController.keyPressPerSecond = 25;
         GameController.lockMode = 1;
         GameController.difficulty = 4;
-        changeScreen("fxml-layouts/classic-easy.fxml/", event);
+        changeScreen("fxml-layouts/game-main.fxml/", event);
     }
 
 }

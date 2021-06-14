@@ -1,15 +1,9 @@
 package application;
 
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -18,12 +12,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import javax.swing.*;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
@@ -47,13 +37,7 @@ public class GameController extends Controller implements Initializable {
     // Initialize variables
 
     @FXML
-    private SplitPane splitPane;
-
-    @FXML
-    private AnchorPane leftPane;
-
-    @FXML
-    private AnchorPane rightPane;
+    private AnchorPane gamePane;
 
     @FXML
     private Pane displayNextPane;
@@ -71,7 +55,7 @@ public class GameController extends Controller implements Initializable {
     private Button btnPlay;
 
     @FXML
-    private Button dummyBtn;
+    private Button backBtn;
 
 
     public static int keyPressPerSecond = 2;
@@ -137,9 +121,9 @@ public class GameController extends Controller implements Initializable {
         holdObj = null;
     }
 
-    private void resetGame(){
+    private void resetGame() {
         setDefault();
-        leftPane.getChildren().clear();
+        gamePane.getChildren().clear();
         displayNextPane.getChildren().clear();
         displayHoldPane.getChildren().clear();
         displayScore.setText("");
@@ -149,8 +133,9 @@ public class GameController extends Controller implements Initializable {
 
     /**
      * Method to initialize fx components
+     *
      * @param url The location used to resolve relative paths for the root object, or null if the location is not known.
-     * @param rb The resources used to localize the root object, or null if the root object was not localized.
+     * @param rb  The resources used to localize the root object, or null if the root object was not localized.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -197,7 +182,7 @@ public class GameController extends Controller implements Initializable {
                         for (int m = 0; m < WIDE; m++) {
                             int key = row * WIDE + m;
                             var block = gameBoard.findBlockByIndex(key);
-                            leftPane.getChildren().remove(block.getUiBox());
+                            gamePane.getChildren().remove(block.getUiBox());
                             parkedBlocks.remove(block);
                         }
 
@@ -222,10 +207,10 @@ public class GameController extends Controller implements Initializable {
                     }
                 }
             }
-          
+
             // Reference: https://www.codewars.com/kata/5da9af1142d7910001815d32
             // Increase scores based on the lines removed and the game diff
-            switch (lineRemoved){
+            switch (lineRemoved) {
                 case 1:
                     score += difficulty * 80;
                     break;
@@ -253,12 +238,12 @@ public class GameController extends Controller implements Initializable {
      * Method to add tetromino to the game board and displays next shape on right pane
      */
     public void addNextTetromino() {
-        if(nextObj == null) generateNextObj();
+        if (nextObj == null) generateNextObj();
 
         tetromino = new Tetromino(nextObj.getPieceName(), true);
         // Display the new added Tetromino shape on the Game Board
         for (TetroBox block : tetromino.getBlocks()) {
-            leftPane.getChildren().add(block.getUiBox());
+            gamePane.getChildren().add(block.getUiBox());
         }
 
         if (nextObj != null) {
@@ -314,12 +299,12 @@ public class GameController extends Controller implements Initializable {
 
                 // Remove the current Tetromino shape from the Game Board Pane
                 for (TetroBox block : tetromino.getBlocks()) {
-                    leftPane.getChildren().remove(block.getUiBox());
+                    gamePane.getChildren().remove(block.getUiBox());
                 }
                 tetromino.changeShape(holdObj.getPieceName());
                 // Display the new added Tetromino shape on the Game Board
                 for (TetroBox block : tetromino.getBlocks()) {
-                    leftPane.getChildren().add(block.getUiBox());
+                    gamePane.getChildren().add(block.getUiBox());
                 }
 
                 // Remove the previous hold Tetromino shape from the Right Pane
@@ -344,12 +329,12 @@ public class GameController extends Controller implements Initializable {
 
                 // Remove the current Tetromino shape from the Game Board Pane
                 for (TetroBox block : tetromino.getBlocks()) {
-                    leftPane.getChildren().remove(block.getUiBox());
+                    gamePane.getChildren().remove(block.getUiBox());
                 }
                 tetromino.changeShape(nextObj.getPieceName());
                 // Display the new added Tetromino shape on the Game Board
                 for (TetroBox block : tetromino.getBlocks()) {
-                    leftPane.getChildren().add(block.getUiBox());
+                    gamePane.getChildren().add(block.getUiBox());
                 }
 
                 // Remove the next shape from the Game Board Pane
@@ -365,21 +350,23 @@ public class GameController extends Controller implements Initializable {
         }
     }
 
-    private void generateNextObj(){
-        if(lockMode == 1) {
-            if(lockModeCounter == 0){
+    private void generateNextObj() {
+        if (lockMode == 1) {
+            if (lockModeCounter == 0) {
                 // Generate random number between 4 to 8
                 lockedMaxNumber = random.nextInt(8 - 4 + 1) + 4;
                 lockedPieceName = Tetromino.generateRandomPieceName();
-                if (debug) System.out.println("lockedMaxNumber: " + lockedMaxNumber + "  lockedPieceName: " + lockedPieceName);
+                if (debug)
+                    System.out.println("lockedMaxNumber: " + lockedMaxNumber + "  lockedPieceName: " + lockedPieceName);
                 lockModeCounter++;
             } else {
-                if (debug) System.out.println("lockModeCounter: " + lockModeCounter + "  lockedPieceName: " + lockedPieceName);
+                if (debug)
+                    System.out.println("lockModeCounter: " + lockModeCounter + "  lockedPieceName: " + lockedPieceName);
                 lockModeCounter++;
-                if(lockModeCounter>lockedMaxNumber) lockModeCounter = 0;
+                if (lockModeCounter > lockedMaxNumber) lockModeCounter = 0;
             }
             nextObj = new Tetromino(lockedPieceName, false);
-        }else {
+        } else {
             nextObj = new Tetromino();
         }
     }
@@ -397,6 +384,7 @@ public class GameController extends Controller implements Initializable {
 
     /**
      * Check if the parked blocks reached the Gameboard top
+     *
      * @return true: at least one parked blocks the top; false: no parked block at the top.
      */
     private boolean reachedTop() {
@@ -407,7 +395,7 @@ public class GameController extends Controller implements Initializable {
         isRunning = false;
         gameOver = true;
         btnPlay.setText("RESTART");
-      
+
         String mode = ModeSelectionController.modeSelect;
         ScoreboardController.writeScoreToFile(Controller.currentProfile.getPlayerName(), mode.substring(0, 1).toUpperCase() + mode.substring(1), score);
         staticScore = score;
@@ -442,52 +430,52 @@ public class GameController extends Controller implements Initializable {
         }
     };
 
-    public void processMoveDown(boolean auto){
+    public void processMoveDown(boolean auto) {
         if (nextObj == null) {
             generateNextObj();
             return;
         }
 
-        if(tetromino == null) return;
+        if (tetromino == null) return;
 
         int moved = tetromino.move(gameBoard.getIndexList(), "down");
         if (moved == 0) { // Touched the bottom or other blocks
-            if(hardDrop) {
+            if (hardDrop) {
                 hardDrop = false;
                 // add score based on the row dropped and difficulty
-                score += difficulty * (HIGH-tetromino.getBaseRowNumber());
+                score += difficulty * (HIGH - tetromino.getBaseRowNumber());
                 displayScore.setText(String.valueOf(score));
             }
             addParkedTetromino();
             clearParkedRows();
 
             // Check Game over: if parked blocks reached the top or new generated blocks can't move down
-            if(reachedTop()) {
+            if (reachedTop()) {
                 processGameOver();
                 return;
             }
 
             // Generate new Tetromino
             addNextTetromino();
-        } else if(moved == 2) {  // Game over since new generated block can't move down
+        } else if (moved == 2) {  // Game over since new generated block can't move down
             hardDrop = false;
             processGameOver();
-        } else if(!auto) {
+        } else if (!auto) {
             // if moved down by player, add score based on difficulty
             score += difficulty;
             displayScore.setText(String.valueOf(score));
         }
     }
 
-    private void processAction(){
+    private void processAction() {
         if (gameOver) {
             btnPlay.setText("PLAY");
             resetGame();
         } else {
             isRunning = !isRunning;
             if (isRunning) {
-                if(nextObj == null) generateNextObj();
-                if(tetromino == null) addNextTetromino();
+                if (nextObj == null) generateNextObj();
+                if (tetromino == null) addNextTetromino();
                 btnPlay.setText("PAUSE");
             } else {
                 // Create and configure a pop up dialog.
@@ -539,12 +527,12 @@ public class GameController extends Controller implements Initializable {
                 if (action > 0) {
                     switch (action) {
                         case 1:
-                            dummyBtn.setOnAction(e -> changeScreen("fxml-layouts/main-screen.fxml", e));
-                            dummyBtn.fire();
+                            backBtn.setOnAction(e -> changeScreen("fxml-layouts/main-screen.fxml", e));
+                            backBtn.fire();
                             break;
                         case 2:
-                            dummyBtn.setOnAction(e -> changeScreen("fxml-layouts/mode-selection.fxml", e));
-                            dummyBtn.fire();
+                            backBtn.setOnAction(e -> changeScreen("fxml-layouts/mode-selection.fxml", e));
+                            backBtn.fire();
                             break;
                     }
                 }
@@ -553,7 +541,15 @@ public class GameController extends Controller implements Initializable {
     }
 
     /**
-     *  Handles mouse click
+     * Handles Back button mouse click
+     */
+    @FXML
+    public void handleBackBtnClick(MouseEvent mouseEvent) {
+        changeScreen("fxml-layouts/mode-selection.fxml", mouseEvent);
+    }
+
+    /**
+     * Handles Play button mouse click
      */
     @FXML
     public void handleMouseClick(MouseEvent mouseEvent) {
@@ -562,6 +558,7 @@ public class GameController extends Controller implements Initializable {
 
     /**
      * Handles arrow key press to move
+     *
      * @param event Keypress action
      */
     @FXML
@@ -643,10 +640,11 @@ public class GameController extends Controller implements Initializable {
     public static int getStaticScore() {
         return staticScore;
     }
+
     /**
      * Changes the current scene to another FXML layout.
      *
-     * @param path - The path to the FXML layout.
+     * @param path  - The path to the FXML layout.
      * @param event - JavaFX ActionEvent
      */
     public void changeScreen(String path, MouseEvent event) {

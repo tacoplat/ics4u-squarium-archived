@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<SplitPane fx:id="splitPane" dividerPositions="0.5" maxHeight="670.0" maxWidth="520.0" minHeight="670.0" minWidth="509.0" prefHeight="670.0" prefWidth="509.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.GameController">
+  <items>
+    <AnchorPane fx:id="leftPane" maxHeight="651.0" maxWidth="302.0" minHeight="651.0" minWidth="302.0" prefHeight="651.0" prefWidth="302.0" styleClass="left-pane">
+         <children>
+            <AnchorPane fx:id="gamePane" maxHeight="650.0" maxWidth="300.0" minHeight="650.0" minWidth="300.0" prefHeight="650.0" prefWidth="300.0" AnchorPane.leftAnchor="1.0" AnchorPane.topAnchor="1.0" />
+         </children></AnchorPane>
+    <AnchorPane fx:id="rightPane" maxHeight="650.0" maxWidth="200.0" minHeight="650.0" minWidth="200.0" prefHeight="650.0" prefWidth="200.0">
+         <children>
+            <Button fx:id="btnPlay" layoutX="34.0" layoutY="558.0" mnemonicParsing="false" onKeyPressed="#handleKeyPress" onMouseClicked="#handleMouseClick" prefHeight="50.0" prefWidth="132.0" styleClass="main-button" text="PLAY" />
+            <Button fx:id="backBtn" layoutX="80.0" layoutY="6.0" mnemonicParsing="false" onMouseClicked="#handleBackBtnClick" prefHeight="40.0" prefWidth="40.0" styleClass="mini-button-round">
+               <graphic>
+                  <FontIcon boundsType="VISUAL" iconColor="WHITE" iconLiteral="mdi-arrow-left-bold" iconSize="30" layoutX="26.0" layoutY="54.0" selectionStart="0" textAlignment="CENTER" />
+               </graphic>
+            </Button>
+            <Pane fx:id="layoutResults" accessibleText="Results" layoutY="69.0" prefHeight="108.0" styleClass="layout-results" AnchorPane.leftAnchor="4.0" AnchorPane.rightAnchor="4.0">
+               <children>
+                  <Label layoutX="14.0" layoutY="26.0" text="Score:">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="displayScore" layoutX="69.0" layoutY="23.0" prefHeight="29.0" prefWidth="117.0" styleClass="display-score">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="26.0" layoutY="70.0" text="Line:">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="displayLineCleared" layoutX="69.0" layoutY="67.0" opacity="0.77" prefHeight="29.0" prefWidth="117.0" styleClass="display-line-cleared">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Label>
+               </children>
+            </Pane>
+            <Pane fx:id="layoutHold" layoutY="194.0" prefHeight="140.0" prefWidth="219.0" styleClass="layout-hold" AnchorPane.leftAnchor="4.0" AnchorPane.rightAnchor="4.0">
+               <children>
+                  <Pane fx:id="displayHoldPane" accessibleText="Hold" layoutX="25.0" layoutY="48.0" prefHeight="70.0" prefWidth="150.0" />
+                  <Label layoutX="76.0" layoutY="14.0" text="Hold">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                  </Label>
+               </children>
+            </Pane>
+            <Pane fx:id="layoutNext" layoutY="363.0" maxWidth="200.0" minWidth="200.0" prefHeight="140.0" prefWidth="200.0" styleClass="layout-next" AnchorPane.leftAnchor="4.0" AnchorPane.rightAnchor="4.0">
+               <children>
+                  <Pane fx:id="displayNextPane" accessibleText="Next" layoutX="25.0" layoutY="52.0" opacity="0.76" prefHeight="70.0" prefWidth="150.0" />
+                  <Label layoutX="76.0" layoutY="14.0" text="Next">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                  </Label>
+               </children>
+            </Pane>
+         </children></AnchorPane>
+  </items>
+</SplitPane>
