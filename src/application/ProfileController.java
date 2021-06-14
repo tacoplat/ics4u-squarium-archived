@@ -8,6 +8,8 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 public class ProfileController extends Controller {
@@ -38,6 +40,17 @@ public class ProfileController extends Controller {
 
         profileTable.setItems(profileList);
         profileTable.setFixedCellSize(24);
+
+        String profileSave = Controller.getDefaultPath() + "/profile.save";
+
+        try {
+            // Generate directory if it does not exist
+            Files.createDirectories(Paths.get(Controller.getDefaultPath()));
+            Files.createFile(Paths.get(profileSave));
+        } catch (IOException ex) {
+            System.out.printf("File creation error: " + ex.getMessage());
+        }
+
 
         // Update list and sort by ascending ID.
         obtainProfilesFromFile(Controller.getDefaultPath() + "/profile.save");
