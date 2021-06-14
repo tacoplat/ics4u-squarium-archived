@@ -5,6 +5,8 @@
 
 ### [USER GUIDE](https://docs.google.com/document/d/16JSJm0jhw9IWmJzCvQTwFJJGiJblaVWmKbR1jW2I68U/edit)
 
+### [DEVELOPMENT INSTRUCTIONS](https://docs.google.com/document/d/1xOuTCNRWW5yM5qLY-PJLOnsY7NGRT63Sc9sqPYilz88/edit#)
+
 ### [Project Statement Scope](https://docs.google.com/document/d/1xLI6LGGu44HKDfOvJ3klcLbo6vebbfh391KwUjpQKhw/edit)
 
 ### [Analysis and Design](https://docs.google.com/document/d/1Eq2BmfXtEzM_xeyPTcP35HNqp3oZDk9lPSvgm5SgpKc/edit)
