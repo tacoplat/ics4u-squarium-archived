@@ -1,5 +1,8 @@
 package application;
 
+/**
+ * Represents a scoreboard listing.
+ */
 public class Scoreboard {
 
     //Instance fields

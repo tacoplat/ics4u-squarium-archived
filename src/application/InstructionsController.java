@@ -15,6 +15,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * An FXML controller for the instructions screen.
+ */
 public class InstructionsController extends Controller {
 
     // Instance fields.

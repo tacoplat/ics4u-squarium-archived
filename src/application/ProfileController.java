@@ -12,6 +12,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Optional;
 
+/**
+ * An FXML controller responsible for controlling the profile selection screen.
+ */
 public class ProfileController extends Controller {
 
     // Instance fields

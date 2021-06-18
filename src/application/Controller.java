@@ -17,6 +17,9 @@ import java.io.*;
 import java.net.URL;
 import java.util.Optional;
 
+/**
+ * The general FXML controller for the game.
+ */
 public class Controller {
 
 	// Instance fields

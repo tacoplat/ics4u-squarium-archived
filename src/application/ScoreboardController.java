@@ -9,6 +9,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import java.io.*;
 import java.util.Optional;
 
+/**
+ * An FXML controller which focuses on the scoreboard.
+ */
 public class ScoreboardController extends Controller {
 
     // Instance fields

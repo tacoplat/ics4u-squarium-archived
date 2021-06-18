@@ -1,5 +1,8 @@
 package application;
 
+/**
+ * Represents a user profile.
+ */
 public class Profile {
 
     // Instance fields

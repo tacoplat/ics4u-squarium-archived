@@ -12,7 +12,9 @@ import javafx.stage.WindowEvent;
 
 import java.net.URL;
 
-
+/**
+ * Responsible for launching the application.
+ */
 public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
